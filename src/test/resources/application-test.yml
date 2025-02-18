@@ -2,8 +2,8 @@ security:
   oauth2:
     registration:
       github:
-        client-secret: client-secret
-        client-id: client-id
+        client-secret: client-secret-test
+        client-id: client-id-test
         response-type: code
         redirect-uri: http://localhost:8080/login/oauth2/code/github
         scope: read:user

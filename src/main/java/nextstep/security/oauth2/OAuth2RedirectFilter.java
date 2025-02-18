@@ -36,13 +36,13 @@ public class OAuth2RedirectFilter extends GenericFilterBean {
 
         var registration = oAuth2RegistrationRepository.getRegistration(vendor);
 
-
         HttpServletResponse httpServletResponse = (HttpServletResponse) servletResponse;
-        httpServletResponse.sendRedirect("https://github.com/login/oauth/authorize" +
-                "?client_id=Iv23liPQmsAjZIP9QKfp" +
-                "&response_type=code" +
-                "&scope=user" +
-                "&redirect_uri=http://localhost:8080/login/oauth2/code/github");
+        httpServletResponse.sendRedirect(registration.getUri() +
+                "?client_id=" + registration.getClientId() +
+                "&response_type=" + registration.getResponseType() +
+                "&scope=" + registration.getScope() +
+                "&redirect_uri=" + registration.getRedirectUri()
+        );
     }
 
 }

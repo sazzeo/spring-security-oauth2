@@ -7,6 +7,8 @@ public class Registration {
     private String redirectUri;
     private String scope;
 
+    private String uri;
+
     public String getClientId() {
         return clientId;
     }
@@ -45,5 +47,13 @@ public class Registration {
 
     public void setScope(final String scope) {
         this.scope = scope;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(final String uri) {
+        this.uri = uri;
     }
 }
