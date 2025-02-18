@@ -18,7 +18,7 @@ import nextstep.security.config.SecurityFilterChain;
 import nextstep.security.context.HttpSessionSecurityContextRepository;
 import nextstep.security.context.SecurityContextHolderFilter;
 import nextstep.security.oauth2.GithubAuthenticationFilter;
-import nextstep.security.oauth2.GithubLoginRedirectFilter;
+import nextstep.security.oauth2.OAuth2RedirectFilter;
 import nextstep.security.userdetails.UserDetails;
 import nextstep.security.userdetails.UserDetailsService;
 import org.springframework.context.annotation.Bean;
@@ -35,9 +35,11 @@ import java.util.Set;
 public class SecurityConfig {
 
     private final MemberRepository memberRepository;
+    private final OAuth2RegistrationRepository oAuth2RegistrationRepository;
 
-    public SecurityConfig(MemberRepository memberRepository) {
+    public SecurityConfig(final MemberRepository memberRepository, final OAuth2RegistrationRepository oAuth2RegistrationRepository) {
         this.memberRepository = memberRepository;
+        this.oAuth2RegistrationRepository = oAuth2RegistrationRepository;
     }
 
     @Bean
@@ -61,7 +63,7 @@ public class SecurityConfig {
                         new SecurityContextHolderFilter(httpSessionSecurityContextRepository()),
                         new UsernamePasswordAuthenticationFilter(userDetailsService()),
                         new BasicAuthenticationFilter(userDetailsService()),
-                        new GithubLoginRedirectFilter(new MvcRequestMatcher(HttpMethod.GET, "/oauth2/authorization/github")),
+                        new OAuth2RedirectFilter(oAuth2RegistrationRepository),
                         new GithubAuthenticationFilter(new MvcRequestMatcher(HttpMethod.GET, "/login/oauth2/code/github"), httpSessionSecurityContextRepository()),
                         new AuthorizationFilter(requestAuthorizationManager())
                 )
