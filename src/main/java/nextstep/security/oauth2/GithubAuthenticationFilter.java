@@ -45,7 +45,6 @@ public class GithubAuthenticationFilter extends GenericFilterBean {
         var code = httpServletRequest.getParameter("code");
         RestTemplate restTemplate = new RestTemplate();
 
-        System.out.println("필터");
         Map<String, String> map = new HashMap<>();
         map.put("client_id", "Iv23liPQmsAjZIP9QKfp");
         map.put("client_secret", "2e2f64556d42e913f8661973bc374fa76cbd9aa2");
