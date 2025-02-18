@@ -15,7 +15,10 @@ import nextstep.security.config.DefaultSecurityFilterChain;
 import nextstep.security.config.DelegatingFilterProxy;
 import nextstep.security.config.FilterChainProxy;
 import nextstep.security.config.SecurityFilterChain;
+import nextstep.security.context.HttpSessionSecurityContextRepository;
 import nextstep.security.context.SecurityContextHolderFilter;
+import nextstep.security.oauth2.GithubAuthenticationFilter;
+import nextstep.security.oauth2.GithubLoginRedirectFilter;
 import nextstep.security.userdetails.UserDetails;
 import nextstep.security.userdetails.UserDetailsService;
 import org.springframework.context.annotation.Bean;
@@ -42,7 +45,6 @@ public class SecurityConfig {
         return new DelegatingFilterProxy(filterChainProxy(List.of(securityFilterChain())));
     }
 
-    @Bean
     public FilterChainProxy filterChainProxy(List<SecurityFilterChain> securityFilterChains) {
         return new FilterChainProxy(securityFilterChains);
     }
@@ -56,12 +58,19 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain() {
         return new DefaultSecurityFilterChain(
                 List.of(
-                        new SecurityContextHolderFilter(),
+                        new SecurityContextHolderFilter(httpSessionSecurityContextRepository()),
                         new UsernamePasswordAuthenticationFilter(userDetailsService()),
                         new BasicAuthenticationFilter(userDetailsService()),
+                        new GithubLoginRedirectFilter(new MvcRequestMatcher(HttpMethod.GET, "/oauth2/authorization/github")),
+                        new GithubAuthenticationFilter(new MvcRequestMatcher(HttpMethod.GET, "/login/oauth2/code/github"), httpSessionSecurityContextRepository()),
                         new AuthorizationFilter(requestAuthorizationManager())
                 )
         );
+    }
+
+    @Bean
+    public HttpSessionSecurityContextRepository httpSessionSecurityContextRepository() {
+        return new HttpSessionSecurityContextRepository();
     }
 
     @Bean
