@@ -2,12 +2,12 @@ package nextstep.security.access;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpMethod;
+import org.springframework.util.AntPathMatcher;
 
 public class AntRequestMatcher implements RequestMatcher {
-
-    private static final String MATCH_ALL = "/**";
-    private HttpMethod method;
-    private String pattern;
+    private final HttpMethod method;
+    private final String pattern;
+    private final AntPathMatcher antPathMatcher = new AntPathMatcher();
 
     public AntRequestMatcher(HttpMethod method, String pattern) {
         this.method = method;
@@ -19,14 +19,7 @@ public class AntRequestMatcher implements RequestMatcher {
         if (this.method != null && !this.method.name().equals(request.getMethod())) {
             return false;
         }
-
-        if (pattern.endsWith(MATCH_ALL)) {
-            var extractUrl = pattern.substring(0, pattern.indexOf(MATCH_ALL));
-            if (request.getRequestURI().startsWith(extractUrl)) {
-                return true;
-            }
-        }
-
-        return request.getRequestURI().equals(pattern);
+        String requestURI = request.getRequestURI();
+        return antPathMatcher.match(pattern, requestURI);
     }
 }
