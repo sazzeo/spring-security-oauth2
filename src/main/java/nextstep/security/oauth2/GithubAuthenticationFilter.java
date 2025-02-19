@@ -6,7 +6,7 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import nextstep.security.access.RequestMatcher;
+import nextstep.app.OAuth2RegistrationRepository;
 import nextstep.security.authentication.Authentication;
 import nextstep.security.authentication.UsernamePasswordAuthenticationToken;
 import nextstep.security.context.HttpSessionSecurityContextRepository;
@@ -24,33 +24,39 @@ import java.util.Map;
 import java.util.Set;
 
 public class GithubAuthenticationFilter extends GenericFilterBean {
-
-    private final RequestMatcher requestMatcher;
     private final HttpSessionSecurityContextRepository securityContextRepository;
+    private final OAuth2RegistrationRepository oAuth2RegistrationRepository;
 
-    public GithubAuthenticationFilter(final RequestMatcher requestMatcher, final HttpSessionSecurityContextRepository securityContextRepository) {
-        this.requestMatcher = requestMatcher;
+
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    public GithubAuthenticationFilter(final HttpSessionSecurityContextRepository securityContextRepository, final OAuth2RegistrationRepository oAuth2RegistrationRepository) {
         this.securityContextRepository = securityContextRepository;
+        this.oAuth2RegistrationRepository = oAuth2RegistrationRepository;
     }
 
     @Override
     public void doFilter(final ServletRequest servletRequest, final ServletResponse servletResponse, final FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
         HttpServletResponse httpServletResponse = (HttpServletResponse) servletResponse;
-        if (!requestMatcher.matches(httpServletRequest)) {
+        var registration = oAuth2RegistrationRepository.getRegistrationByRedirectUrl(httpServletRequest);
+        if (registration == null) {
             filterChain.doFilter(servletRequest, servletResponse);
             return;
         }
-
         var code = httpServletRequest.getParameter("code");
-        RestTemplate restTemplate = new RestTemplate();
-
+        if (code == null) {
+            filterChain.doFilter(servletRequest, servletResponse);
+            return;
+        }
         Map<String, String> map = new HashMap<>();
-        map.put("client_id", "Iv23liPQmsAjZIP9QKfp");
-        map.put("client_secret", "2e2f64556d42e913f8661973bc374fa76cbd9aa2");
+        map.put("client_id", registration.getClientId());
+        map.put("client_secret", registration.getClientSecret());
         map.put("code", code);
-
-        var response = restTemplate.postForObject("https://github.com/login/oauth/access_token", map, Map.class);
+        var response = restTemplate.postForObject(
+                registration.getTokenUri(),
+                map,
+                Map.class);
 
         var accessToken = (String) response.get("access_token");
 

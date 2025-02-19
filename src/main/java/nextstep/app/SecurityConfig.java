@@ -58,16 +58,12 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain() {
-        return new DefaultSecurityFilterChain(
-                List.of(
-                        new SecurityContextHolderFilter(httpSessionSecurityContextRepository()),
-                        new UsernamePasswordAuthenticationFilter(userDetailsService()),
-                        new BasicAuthenticationFilter(userDetailsService()),
-                        new OAuth2RedirectFilter(oAuth2RegistrationRepository),
-                        new GithubAuthenticationFilter(new MvcRequestMatcher(HttpMethod.GET, "/login/oauth2/code/github"), httpSessionSecurityContextRepository()),
-                        new AuthorizationFilter(requestAuthorizationManager())
-                )
-        );
+        return new DefaultSecurityFilterChain(List.of(new SecurityContextHolderFilter(httpSessionSecurityContextRepository()),
+                new UsernamePasswordAuthenticationFilter(userDetailsService()),
+                new BasicAuthenticationFilter(userDetailsService()),
+                new OAuth2RedirectFilter(oAuth2RegistrationRepository),
+                new GithubAuthenticationFilter(httpSessionSecurityContextRepository(), oAuth2RegistrationRepository),
+                new AuthorizationFilter(requestAuthorizationManager())));
     }
 
     @Bean
@@ -77,9 +73,7 @@ public class SecurityConfig {
 
     @Bean
     public RoleHierarchy roleHierarchy() {
-        return RoleHierarchyImpl.with()
-                .role("ADMIN").implies("USER")
-                .build();
+        return RoleHierarchyImpl.with().role("ADMIN").implies("USER").build();
     }
 
     @Bean
@@ -95,8 +89,7 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> {
-            Member member = memberRepository.findByEmail(username)
-                    .orElseThrow(() -> new AuthenticationException("존재하지 않는 사용자입니다."));
+            Member member = memberRepository.findByEmail(username).orElseThrow(() -> new AuthenticationException("존재하지 않는 사용자입니다."));
 
             return new UserDetails() {
                 @Override

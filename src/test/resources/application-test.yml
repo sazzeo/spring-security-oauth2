@@ -8,12 +8,12 @@ security:
         redirect-uri: http://localhost:8080/login/oauth2/code/github
         scope: read:user
         authorize-uri: https://github.com/login/oauth/authorize
-        token-uri: https://github.com/login/oauth/access_token
+        token-uri: http://localhost:8089/login/oauth/access_token
       google:
         client-secret: client-secret-test
         client-id: client-id-test
         response-type: code
         redirect-uri: http://localhost:8080/login/oauth2/code/google
         scope: https://www.googleapis.com/auth/userinfo.email
-        uri: https://accounts.google.com/o/oauth2/v2/auth
-        authorize-token-uri: https://oauth2.googleapis.com/token
+        authorize-uri: https://accounts.google.com/o/oauth2/v2/auth
+        token-uri: https://oauth2.googleapis.com/token
