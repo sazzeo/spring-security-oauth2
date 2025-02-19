@@ -14,7 +14,7 @@ public class OAuth2RegistrationRepository {
     }
 
     public Registration getRegistration(final String key) {
-        return oAuth2Properties.getRegistration().get(key);
+        return oAuth2Properties.getRegistration(key);
     }
 
 }

@@ -1,5 +1,6 @@
 package nextstep.security.properties;
 
+import jakarta.annotation.Nullable;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.HashMap;
@@ -9,8 +10,9 @@ import java.util.Map;
 public class OAuth2Properties {
     private Map<String, Registration> registration = new HashMap<>();
 
-    public Map<String, Registration> getRegistration() {
-        return registration;
+    @Nullable
+    public Registration getRegistration(final String key) {
+        return registration.get(key);
     }
 
     public void setRegistration(final Map<String, Registration> registration) {

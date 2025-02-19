@@ -1,5 +1,6 @@
 package nextstep.app;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -17,6 +18,7 @@ class OAuth2PropertiesRedirectFilterTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @DisplayName("/oauth2/authorization/github 로 들어왔을 때 https://github.com/login/oauth/authorize 로 리다이렉트된다.")
     @Test
     void redirectTest() throws Exception {
         String requestUri = "/oauth2/authorization/github";
@@ -30,4 +32,13 @@ class OAuth2PropertiesRedirectFilterTest {
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
                 .andExpect(MockMvcResultMatchers.redirectedUrl(expectedRedirectUri));
     }
+
+    @DisplayName("/oauth2/authorization/test 로 들어왔을 때 404를 반환한다.")
+    @Test
+    void notFoundTest() throws Exception {
+        String requestUri = "/oauth2/authorization/test";
+        mockMvc.perform(MockMvcRequestBuilders.get(requestUri))
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
 }

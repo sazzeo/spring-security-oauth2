@@ -29,12 +29,13 @@ public class OAuth2RedirectFilter extends GenericFilterBean {
             filterChain.doFilter(servletRequest, servletResponse);
             return;
         }
-
         StringBuffer url = httpServletRequest.getRequestURL();
         var vendor = url.substring(url.lastIndexOf("/") + 1);
-        System.out.println(vendor);
-
         var registration = oAuth2RegistrationRepository.getRegistration(vendor);
+        if (registration == null) {
+            filterChain.doFilter(servletRequest, servletResponse);
+            return;
+        }
 
         HttpServletResponse httpServletResponse = (HttpServletResponse) servletResponse;
         httpServletResponse.sendRedirect(registration.getUri() +
