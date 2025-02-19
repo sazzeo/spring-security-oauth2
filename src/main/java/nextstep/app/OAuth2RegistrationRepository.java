@@ -1,5 +1,7 @@
 package nextstep.app;
 
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import nextstep.security.properties.OAuth2Properties;
 import nextstep.security.properties.Registration;
 import org.springframework.stereotype.Component;
@@ -17,4 +19,8 @@ public class OAuth2RegistrationRepository {
         return oAuth2Properties.getRegistration(key);
     }
 
+    @Nullable
+    public Registration getRegistrationByRedirectUrl(final HttpServletRequest request) {
+        return oAuth2Properties.getRegistrationByRedirectUrl(request);
+    }
 }

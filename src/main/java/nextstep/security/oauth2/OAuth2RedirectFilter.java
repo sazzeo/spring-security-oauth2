@@ -38,7 +38,7 @@ public class OAuth2RedirectFilter extends GenericFilterBean {
         }
 
         HttpServletResponse httpServletResponse = (HttpServletResponse) servletResponse;
-        httpServletResponse.sendRedirect(registration.getUri() +
+        httpServletResponse.sendRedirect(registration.getAuthorizeUri() +
                 "?client_id=" + registration.getClientId() +
                 "&response_type=" + registration.getResponseType() +
                 "&scope=" + registration.getScope() +

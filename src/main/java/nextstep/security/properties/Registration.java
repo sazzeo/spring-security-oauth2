@@ -5,6 +5,9 @@ import nextstep.security.access.MvcRequestMatcher;
 import nextstep.security.access.RequestMatcher;
 import org.springframework.http.HttpMethod;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 public class Registration {
     private String clientId;
     private String clientSecret;
@@ -13,13 +16,13 @@ public class Registration {
     private String scope;
     private String authorizeUri;
     private String tokenUri;
-    private RequestMatcher requestMatcher;
+    private RequestMatcher redirectRequestMatcher;
 
     public boolean matchRedirectUrl(final HttpServletRequest request) {
-        if (requestMatcher == null) {
+        if (redirectRequestMatcher == null) {
             return false;
         }
-        return requestMatcher.matches(request);
+        return redirectRequestMatcher.matches(request);
     }
 
     public String getClientId() {
@@ -64,7 +67,12 @@ public class Registration {
 
     public void setRedirectUri(final String redirectUri) {
         this.redirectUri = redirectUri;
-        this.requestMatcher = new MvcRequestMatcher(HttpMethod.GET, redirectUri);
+        try {
+            var uri = new URI(redirectUri);
+            this.redirectRequestMatcher = new MvcRequestMatcher(HttpMethod.GET, uri.getPath());
+        } catch (URISyntaxException ex) {
+            throw new IllegalArgumentException("oauth2 client redirect-url 이 부적절합니다.");
+        }
     }
 
     public void setScope(final String scope) {
