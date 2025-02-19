@@ -20,7 +20,7 @@ class OAuth2PropertiesRedirectFilterTest {
 
     @DisplayName("/oauth2/authorization/github 로 들어왔을 때 https://github.com/login/oauth/authorize 로 리다이렉트된다.")
     @Test
-    void redirectTest() throws Exception {
+    void redirectGithubTest() throws Exception {
         String requestUri = "/oauth2/authorization/github";
         String expectedRedirectUri = "https://github.com/login/oauth/authorize" +
                 "?client_id=client-id-test" +
@@ -32,6 +32,22 @@ class OAuth2PropertiesRedirectFilterTest {
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
                 .andExpect(MockMvcResultMatchers.redirectedUrl(expectedRedirectUri));
     }
+
+    @DisplayName("/oauth2/authorization/google 로 들어왔을 때 https://accounts.google.com/o/oauth2/v2/auth 로 리다이렉트된다.")
+    @Test
+    void redirectGoogleTest() throws Exception {
+        String requestUri = "/oauth2/authorization/google";
+        String expectedRedirectUri = "https://accounts.google.com/o/oauth2/v2/auth" +
+                "?client_id=client-id-test" +
+                "&response_type=code" +
+                "&scope=https://www.googleapis.com/auth/userinfo.email" +
+                "&redirect_uri=http://localhost:8080/login/oauth2/code/google";
+
+        mockMvc.perform(MockMvcRequestBuilders.get(requestUri))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+                .andExpect(MockMvcResultMatchers.redirectedUrl(expectedRedirectUri));
+    }
+
 
     @DisplayName("/oauth2/authorization/test 로 들어왔을 때 404를 반환한다.")
     @Test

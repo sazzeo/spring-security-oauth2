@@ -8,3 +8,10 @@ security:
         redirect-uri: http://localhost:8080/login/oauth2/code/github
         scope: read:user
         uri: https://github.com/login/oauth/authorize
+      google:
+        client-secret: client-secret
+        client-id: client-id
+        response-type: code
+        redirect-uri: http://localhost:8080/login/oauth2/code/google
+        scope: https://www.googleapis.com/auth/userinfo.email
+        uri: https://accounts.google.com/o/oauth2/v2/auth
