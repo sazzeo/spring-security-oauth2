@@ -8,6 +8,7 @@ import nextstep.security.access.RequestMatcher;
 import nextstep.app.OAuth2RegistrationRepository;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.filter.GenericFilterBean;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 
@@ -38,12 +39,16 @@ public class OAuth2RedirectFilter extends GenericFilterBean {
         }
 
         HttpServletResponse httpServletResponse = (HttpServletResponse) servletResponse;
-        httpServletResponse.sendRedirect(registration.getAuthorizeUri() +
-                "?client_id=" + registration.getClientId() +
-                "&response_type=" + registration.getResponseType() +
-                "&scope=" + registration.getScope() +
-                "&redirect_uri=" + registration.getRedirectUri()
-        );
+
+        var redirectPath = UriComponentsBuilder.fromHttpUrl(registration.getAuthorizeUri())
+                .queryParam(OAuth2Parameter.CLIENT_ID.getPath(), registration.getClientId())
+                .queryParam(OAuth2Parameter.RESPONSE_TYPE.getPath(), registration.getResponseType())
+                .queryParam(OAuth2Parameter.SCOPE.getPath(), registration.getScope())
+                .queryParam(OAuth2Parameter.REDIRECT_URL.getPath(), registration.getRedirectUri())
+                .toUriString();
+
+        httpServletResponse.sendRedirect(redirectPath);
     }
+
 
 }
