@@ -27,7 +27,7 @@ public class OAuth2AuthenticationFilter extends GenericFilterBean {
     public OAuth2AuthenticationFilter(final OAuth2RegistrationRepository oAuth2RegistrationRepository,
                                       final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler,
                                       final List<OAuth2UserDetailsService> userDetailsServices
-            ) {
+    ) {
         this.oAuth2RegistrationRepository = oAuth2RegistrationRepository;
         this.oAuth2AccessTokenRequestProvider = new OAuth2AccessTokenRequestProviderImpl();
         this.oauth2UserDetailsServiceResolver = new OAuth2UserDetailsServiceResolver(userDetailsServices);
@@ -55,7 +55,7 @@ public class OAuth2AuthenticationFilter extends GenericFilterBean {
         try {
             var userDetails = oauth2DetailsService.loadUserByAccessToken(accessToken);
             var authenticatedToken = OAuth2UserDetailsAuthenticationToken
-                    .authenticated(userDetails.getUsername(), accessToken, Set.of("USER"));
+                    .authenticated(userDetails.getUsername(), accessToken, userDetails.getAuthorities(), userDetails);
             oAuth2AuthenticationSuccessHandler.onSuccess(httpServletRequest, httpServletResponse, authenticatedToken);
         } catch (Exception ex) {
             //TODO failHandler 구현

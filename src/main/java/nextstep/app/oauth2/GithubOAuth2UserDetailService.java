@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
+import java.util.Set;
 
 @Component
 public class GithubOAuth2UserDetailService implements OAuth2UserDetailsService {
@@ -36,10 +37,9 @@ public class GithubOAuth2UserDetailService implements OAuth2UserDetailsService {
         var name = (String) userResponse.get("name");
         var avatarUrl = (String) userResponse.get("avatar_url");
 
-        return new OAuth2UserDetailsImpl(email,
-                Map.of(
-                        "name", name,
-                        "avatarUrl", avatarUrl));
+        return new OAuth2UserDetailsImpl(email, Map.of("name", name,
+                "avatarUrl", avatarUrl),
+                Set.of("USER"));
     }
 
     @Override

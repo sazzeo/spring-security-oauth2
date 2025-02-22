@@ -3,8 +3,9 @@ package nextstep.app.oauth2;
 import nextstep.security.oauth2.userdetails.OAuth2UserDetails;
 
 import java.util.Map;
+import java.util.Set;
 
-public record OAuth2UserDetailsImpl(String userName, Map<String, String> details) implements OAuth2UserDetails {
+public record OAuth2UserDetailsImpl(String userName, Map<String, String> details, Set<String> authorities) implements OAuth2UserDetails {
 
     @Override
     public String getUsername() {
@@ -12,7 +13,12 @@ public record OAuth2UserDetailsImpl(String userName, Map<String, String> details
     }
 
     @Override
-    public Map<String, String> getDetails() {
+    public Map<String, String> getOthers() {
         return this.details;
+    }
+
+    @Override
+    public Set<String> getAuthorities() {
+        return this.authorities;
     }
 }
