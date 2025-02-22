@@ -40,9 +40,32 @@ class OAuth2AuthenticationFilterTest {
     }
 
     @Test
-    @DisplayName("redirect 된 code로 accessToken 정보를 가 session 에 저장한 후 /members/me로 정보를 조회할 수 있다.")
-    void redirectAndRequestGithubAccessToken() throws Exception {
+    @DisplayName("github redirect 된 code로 accessToken 정보를 가 session 에 저장한 후 /members/me로 정보를 조회할 수 있다.")
+    void githubRedirectAndRequestGithubAccessToken() throws Exception {
         String requestUri = "/login/oauth2/code/github?code=mock_code";
+        MockHttpSession session = new MockHttpSession();
+
+        mockMvc.perform(MockMvcRequestBuilders.get(requestUri)
+                        .session(session))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/"));
+
+        ResultActions response = mockMvc.perform(MockMvcRequestBuilders
+                .get("/members/me")
+                .session(session)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+        );
+
+        response.andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.email")
+                        .value("a@a.com"));
+
+    }
+
+    @Test
+    @DisplayName("google redirect 된 code로 accessToken 정보를 가 session 에 저장한 후 /members/me로 정보를 조회할 수 있다.")
+    void googleAndRequestGithubAccessToken() throws Exception {
+        String requestUri = "/login/oauth2/code/google?code=mock_code";
         MockHttpSession session = new MockHttpSession();
 
         mockMvc.perform(MockMvcRequestBuilders.get(requestUri)
@@ -68,7 +91,14 @@ class OAuth2AuthenticationFilterTest {
         responseBody.put("token_type", "bearer");
         String jsonResponse = new ObjectMapper().writeValueAsString(responseBody);
 
+        //github용
         stubFor(post(urlEqualTo("/login/oauth/access_token"))
+                .willReturn(aResponse()
+                        .withHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+                        .withBody(jsonResponse)));
+
+        //google 용
+        stubFor(post(urlEqualTo("/token"))
                 .willReturn(aResponse()
                         .withHeader(HttpHeaders.CONTENT_TYPE, "application/json")
                         .withBody(jsonResponse)));
@@ -81,7 +111,14 @@ class OAuth2AuthenticationFilterTest {
         userProfile.put("avatar_url", "");
         String profileJsonResponse = new ObjectMapper().writeValueAsString(userProfile);
 
+        //github용
         stubFor(get(urlEqualTo("/user"))
+                .willReturn(aResponse()
+                        .withHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+                        .withBody(profileJsonResponse)));
+
+        //google 용
+        stubFor(get(urlEqualTo("/oauth2/v2/userinfo"))
                 .willReturn(aResponse()
                         .withHeader(HttpHeaders.CONTENT_TYPE, "application/json")
                         .withBody(profileJsonResponse)));

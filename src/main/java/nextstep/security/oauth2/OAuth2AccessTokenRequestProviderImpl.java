@@ -18,7 +18,8 @@ public class OAuth2AccessTokenRequestProviderImpl implements OAuth2AccessTokenRe
         map.put(OAuth2Parameter.CLIENT_ID.getPath(), registration.getClientId());
         map.put(OAuth2Parameter.CLIENT_SECRET.getPath(), registration.getClientSecret());
         map.put(OAuth2Parameter.CODE.getPath(), code);
-
+        map.put(OAuth2Parameter.GRANT_TYPE.getPath(), registration.getGrantType());
+        map.put(OAuth2Parameter.REDIRECT_URL.getPath(), registration.getRedirectUri());
         var response = doPost(registration.getTokenUri(), map);
         return (String) response.get("access_token");
     }
