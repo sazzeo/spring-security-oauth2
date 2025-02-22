@@ -2,9 +2,6 @@ package nextstep.app;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpSession;
-import nextstep.security.context.HttpSessionSecurityContextRepository;
-import nextstep.security.context.SecurityContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,8 +10,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -40,22 +40,26 @@ class OAuth2AuthenticationFilterTest {
     }
 
     @Test
-    @DisplayName("redirect 된 code로 accessToken 정보를 가져와 user 정보를 session 에 저장한다")
+    @DisplayName("redirect 된 code로 accessToken 정보를 가 session 에 저장한 후 /members/me로 정보를 조회할 수 있다.")
     void redirectAndRequestGithubAccessToken() throws Exception {
         String requestUri = "/login/oauth2/code/github?code=mock_code";
+        MockHttpSession session = new MockHttpSession();
 
-        mockMvc.perform(MockMvcRequestBuilders.get(requestUri))
+        mockMvc.perform(MockMvcRequestBuilders.get(requestUri)
+                        .session(session))
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/"))
-                .andExpect(request -> {
-                    HttpSession session = request.getRequest().getSession();
-                    assert session != null;
-                    SecurityContext context = (SecurityContext) session.getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY);
-                    assertThat(context).isNotNull();
-                    assertThat(context.getAuthentication()).isNotNull();
-                    assertThat(context.getAuthentication().isAuthenticated()).isTrue();
-                    assertThat(context.getAuthentication().getPrincipal()).isEqualTo("a@a.com");
-                });
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/"));
+
+        ResultActions response = mockMvc.perform(MockMvcRequestBuilders
+                .get("/members/me")
+                .session(session)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+        );
+
+        response.andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.email")
+                        .value("a@a.com"));
+
     }
 
     private static void stubForAccessToken() throws JsonProcessingException {
