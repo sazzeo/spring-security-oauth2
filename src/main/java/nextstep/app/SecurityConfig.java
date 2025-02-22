@@ -17,8 +17,9 @@ import nextstep.security.config.FilterChainProxy;
 import nextstep.security.config.SecurityFilterChain;
 import nextstep.security.context.HttpSessionSecurityContextRepository;
 import nextstep.security.context.SecurityContextHolderFilter;
-import nextstep.security.oauth2.GithubAuthenticationFilter;
+import nextstep.security.oauth2.OAuth2AuthenticationFilter;
 import nextstep.security.oauth2.OAuth2RedirectFilter;
+import nextstep.security.oauth2.userdetails.OAuth2UserDetailsService;
 import nextstep.security.userdetails.UserDetails;
 import nextstep.security.userdetails.UserDetailsService;
 import org.springframework.context.annotation.Bean;
@@ -36,10 +37,14 @@ public class SecurityConfig {
 
     private final MemberRepository memberRepository;
     private final OAuth2RegistrationRepository oAuth2RegistrationRepository;
+    private final List<OAuth2UserDetailsService> oAuth2UserDetailsServices;
 
-    public SecurityConfig(final MemberRepository memberRepository, final OAuth2RegistrationRepository oAuth2RegistrationRepository) {
+    public SecurityConfig(final MemberRepository memberRepository,
+                          final OAuth2RegistrationRepository oAuth2RegistrationRepository,
+                          final List<OAuth2UserDetailsService> oAuth2UserDetailsServices) {
         this.memberRepository = memberRepository;
         this.oAuth2RegistrationRepository = oAuth2RegistrationRepository;
+        this.oAuth2UserDetailsServices = oAuth2UserDetailsServices;
     }
 
     @Bean
@@ -62,7 +67,9 @@ public class SecurityConfig {
                 new UsernamePasswordAuthenticationFilter(userDetailsService()),
                 new BasicAuthenticationFilter(userDetailsService()),
                 new OAuth2RedirectFilter(oAuth2RegistrationRepository),
-                new GithubAuthenticationFilter(httpSessionSecurityContextRepository(), oAuth2RegistrationRepository),
+                new OAuth2AuthenticationFilter(httpSessionSecurityContextRepository(),
+                        oAuth2RegistrationRepository,
+                        oAuth2UserDetailsServices),
                 new AuthorizationFilter(requestAuthorizationManager())));
     }
 
