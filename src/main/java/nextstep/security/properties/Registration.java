@@ -1,5 +1,6 @@
 package nextstep.security.properties;
 
+import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 import nextstep.security.access.MvcRequestMatcher;
 import nextstep.security.access.RequestMatcher;
@@ -95,5 +96,16 @@ public class Registration {
 
     public void setVendor(final String vendor) {
         this.vendor = vendor;
+    }
+
+    @Nullable
+    public String getGrantType() {
+        if (responseType == null) {
+            return null;
+        }
+        if (this.responseType.equals("code")) {
+            return "authorization_code";
+        }
+        return null;
     }
 }

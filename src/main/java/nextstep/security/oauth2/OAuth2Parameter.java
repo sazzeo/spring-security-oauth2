@@ -8,7 +8,7 @@ public enum OAuth2Parameter {
     REDIRECT_URL("redirect_uri"),
     RESPONSE_TYPE("response_type"),
     CODE("code"),
-
+    GRANT_TYPE("grant_type")
     ;
 
     private final String path;

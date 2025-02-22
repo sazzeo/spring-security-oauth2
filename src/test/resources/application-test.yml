@@ -14,11 +14,14 @@ security:
         client-id: client-id-test
         response-type: code
         redirect-uri: http://localhost:8080/login/oauth2/code/google
-        scope: https://www.googleapis.com/auth/userinfo.email
+        scope: https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile
         authorize-uri: https://accounts.google.com/o/oauth2/v2/auth
-        token-uri: https://oauth2.googleapis.com/token
+        token-uri: http://localhost:8089/token
 
 app:
   oauth2:
     github:
       user-url: http://localhost:8089/user
+    google:
+      user-url: http://localhost:8089/oauth2/v2/userinfo
+

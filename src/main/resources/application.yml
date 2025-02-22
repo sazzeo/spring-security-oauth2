@@ -20,7 +20,7 @@ security:
         client-id: client-id
         response-type: code
         redirect-uri: http://localhost:8080/login/oauth2/code/google
-        scope: https://www.googleapis.com/auth/userinfo.email
+        scope: https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile
         uri: https://accounts.google.com/o/oauth2/v2/auth
         authorize-uri: https://accounts.google.com/o/oauth2/v2/auth
         token-uri: https://oauth2.googleapis.com/token
@@ -30,3 +30,5 @@ app:
   oauth2:
     github:
       user-url: https://api.github.com/user
+    google:
+      user-url: https://www.googleapis.com/oauth2/v2/userinfo
