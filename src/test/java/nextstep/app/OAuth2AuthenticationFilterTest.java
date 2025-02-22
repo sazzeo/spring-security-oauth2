@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpSession;
 import nextstep.security.context.HttpSessionSecurityContextRepository;
 import nextstep.security.context.SecurityContext;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -39,6 +40,7 @@ class OAuth2AuthenticationFilterTest {
     }
 
     @Test
+    @DisplayName("redirect 된 code로 accessToken 정보를 가져와 user 정보를 session 에 저장한다")
     void redirectAndRequestGithubAccessToken() throws Exception {
         String requestUri = "/login/oauth2/code/github?code=mock_code";
 

@@ -7,11 +7,7 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import nextstep.app.OAuth2RegistrationRepository;
-import nextstep.security.authentication.Authentication;
 import nextstep.security.authentication.OAuth2UserDetailsAuthenticationToken;
-import nextstep.security.context.HttpSessionSecurityContextRepository;
-import nextstep.security.context.SecurityContext;
-import nextstep.security.context.SecurityContextHolder;
 import nextstep.security.oauth2.userdetails.OAuth2UserDetailsService;
 import nextstep.security.oauth2.userdetails.OAuth2UserDetailsServiceResolver;
 import org.springframework.web.filter.GenericFilterBean;
@@ -21,17 +17,21 @@ import java.util.List;
 import java.util.Set;
 
 public class OAuth2AuthenticationFilter extends GenericFilterBean {
-    private final HttpSessionSecurityContextRepository securityContextRepository;
     private final OAuth2RegistrationRepository oAuth2RegistrationRepository;
     private final OAuth2AccessTokenRequestProvider oAuth2AccessTokenRequestProvider;
 
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+
     private final OAuth2UserDetailsServiceResolver oauth2UserDetailsServiceResolver;
 
-    public OAuth2AuthenticationFilter(final HttpSessionSecurityContextRepository securityContextRepository, final OAuth2RegistrationRepository oAuth2RegistrationRepository, final List<OAuth2UserDetailsService> userDetailsServices) {
-        this.securityContextRepository = securityContextRepository;
+    public OAuth2AuthenticationFilter(final OAuth2RegistrationRepository oAuth2RegistrationRepository,
+                                      final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler,
+                                      final List<OAuth2UserDetailsService> userDetailsServices
+            ) {
         this.oAuth2RegistrationRepository = oAuth2RegistrationRepository;
         this.oAuth2AccessTokenRequestProvider = new OAuth2AccessTokenRequestProviderImpl();
         this.oauth2UserDetailsServiceResolver = new OAuth2UserDetailsServiceResolver(userDetailsServices);
+        this.oAuth2AuthenticationSuccessHandler = oAuth2AuthenticationSuccessHandler;
     }
 
     @Override
@@ -52,13 +52,13 @@ public class OAuth2AuthenticationFilter extends GenericFilterBean {
 
         var oauth2DetailsService = oauth2UserDetailsServiceResolver.getService(registration.getVendor());
 
-        var userDetails = oauth2DetailsService.loadUserByAccessToken(accessToken);
-
-        Authentication usernamePasswordToken = OAuth2UserDetailsAuthenticationToken.authenticated(userDetails.getUsername(), accessToken, Set.of("USER"));
-
-        SecurityContext context = new SecurityContext(usernamePasswordToken);
-        SecurityContextHolder.setContext(context);
-        securityContextRepository.saveContext(context, httpServletRequest, httpServletResponse);
-        httpServletResponse.sendRedirect("/");
+        try {
+            var userDetails = oauth2DetailsService.loadUserByAccessToken(accessToken);
+            var authenticatedToken = OAuth2UserDetailsAuthenticationToken
+                    .authenticated(userDetails.getUsername(), accessToken, Set.of("USER"));
+            oAuth2AuthenticationSuccessHandler.onSuccess(httpServletRequest, httpServletResponse, authenticatedToken);
+        } catch (Exception ex) {
+            //TODO failHandler 구현
+        }
     }
 }
