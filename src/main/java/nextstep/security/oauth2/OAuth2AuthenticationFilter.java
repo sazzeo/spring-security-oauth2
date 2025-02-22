@@ -12,6 +12,8 @@ import nextstep.security.authentication.UsernamePasswordAuthenticationToken;
 import nextstep.security.context.HttpSessionSecurityContextRepository;
 import nextstep.security.context.SecurityContext;
 import nextstep.security.context.SecurityContextHolder;
+import nextstep.security.oauth2.userdetails.OAuth2UserDetailsService;
+import nextstep.security.oauth2.userdetails.OAuth2UserDetailsServiceResolver;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -19,20 +21,25 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class GithubAuthenticationFilter extends GenericFilterBean {
+public class OAuth2AuthenticationFilter extends GenericFilterBean {
     private final HttpSessionSecurityContextRepository securityContextRepository;
     private final OAuth2RegistrationRepository oAuth2RegistrationRepository;
+    private final OAuth2AccessTokenRequestProvider oAuth2AccessTokenRequestProvider;
 
+    private final OAuth2UserDetailsServiceResolver oauth2UserDetailsServiceResolver;
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public GithubAuthenticationFilter(final HttpSessionSecurityContextRepository securityContextRepository, final OAuth2RegistrationRepository oAuth2RegistrationRepository) {
+    public OAuth2AuthenticationFilter(final HttpSessionSecurityContextRepository securityContextRepository,
+                                      final OAuth2RegistrationRepository oAuth2RegistrationRepository,
+                                      final Map<String, OAuth2UserDetailsService> userDetailsServiceMap) {
         this.securityContextRepository = securityContextRepository;
         this.oAuth2RegistrationRepository = oAuth2RegistrationRepository;
+        this.oAuth2AccessTokenRequestProvider = new OAuth2AccessTokenRequestProviderImpl();
+        this.oauth2UserDetailsServiceResolver = new OAuth2UserDetailsServiceResolver(userDetailsServiceMap);
     }
 
     @Override
@@ -49,21 +56,14 @@ public class GithubAuthenticationFilter extends GenericFilterBean {
             filterChain.doFilter(servletRequest, servletResponse);
             return;
         }
-        Map<String, String> map = new HashMap<>();
-        map.put("client_id", registration.getClientId());
-        map.put("client_secret", registration.getClientSecret());
-        map.put("code", code);
-        var response = restTemplate.postForObject(
-                registration.getTokenUri(),
-                map,
-                Map.class);
-
-        var accessToken = (String) response.get("access_token");
+        var accessToken = oAuth2AccessTokenRequestProvider.getAccessToken(registration, code);
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + accessToken);
         HttpEntity<Void> httpEntity = new HttpEntity<>(headers);
-        var userResponse = restTemplate.exchange("https://api.github.com/user", HttpMethod.GET, httpEntity, Map.class)
+
+        var userResponse = restTemplate
+                .exchange("https://api.github.com/user", HttpMethod.GET, httpEntity, Map.class)
                 .getBody();
 
         var email = (String) userResponse.get("email");

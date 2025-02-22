@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @AutoConfigureMockMvc
 @AutoConfigureWireMock(port = 8089)
-class GithubAuthenticationFilterTest {
+class OAuth2AuthenticationFilterTest {
 
     @Autowired
     private MockMvc mockMvc;

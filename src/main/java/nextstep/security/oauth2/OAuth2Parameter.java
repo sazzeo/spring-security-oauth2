@@ -7,6 +7,7 @@ public enum OAuth2Parameter {
     SCOPE("scope"),
     REDIRECT_URL("redirect_uri"),
     RESPONSE_TYPE("response_type"),
+    CODE("code"),
 
     ;
 
