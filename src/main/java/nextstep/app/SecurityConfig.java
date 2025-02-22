@@ -1,7 +1,9 @@
 package nextstep.app;
 
+import nextstep.app.application.MemberService;
 import nextstep.app.domain.Member;
 import nextstep.app.domain.MemberRepository;
+import nextstep.app.oauth2.OAuth2AuthenticationSuccessHandlerImpl;
 import nextstep.security.access.AnyRequestMatcher;
 import nextstep.security.access.MvcRequestMatcher;
 import nextstep.security.access.RequestMatcherEntry;
@@ -39,16 +41,17 @@ public class SecurityConfig {
     private final MemberRepository memberRepository;
     private final OAuth2RegistrationRepository oAuth2RegistrationRepository;
     private final List<OAuth2UserDetailsService> oAuth2UserDetailsServices;
-    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+
+    private final MemberService memberService;
 
     public SecurityConfig(final MemberRepository memberRepository,
                           final OAuth2RegistrationRepository oAuth2RegistrationRepository,
                           final List<OAuth2UserDetailsService> oAuth2UserDetailsServices,
-                          final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler) {
+                          final MemberService memberService) {
         this.memberRepository = memberRepository;
         this.oAuth2RegistrationRepository = oAuth2RegistrationRepository;
         this.oAuth2UserDetailsServices = oAuth2UserDetailsServices;
-        this.oAuth2AuthenticationSuccessHandler = oAuth2AuthenticationSuccessHandler;
+        this.memberService = memberService;
     }
 
     @Bean
@@ -73,7 +76,7 @@ public class SecurityConfig {
                 new OAuth2RedirectFilter(oAuth2RegistrationRepository),
                 new OAuth2AuthenticationFilter(
                         oAuth2RegistrationRepository,
-                        oAuth2AuthenticationSuccessHandler,
+                        oAuth2AuthenticationSuccessHandler(),
                         oAuth2UserDetailsServices),
                 new AuthorizationFilter(requestAuthorizationManager())));
     }
@@ -120,5 +123,12 @@ public class SecurityConfig {
                 }
             };
         };
+    }
+
+    @Bean
+    public OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler() {
+        return new OAuth2AuthenticationSuccessHandlerImpl(
+                httpSessionSecurityContextRepository(),
+                memberService);
     }
 }
