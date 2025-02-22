@@ -17,3 +17,8 @@ security:
         scope: https://www.googleapis.com/auth/userinfo.email
         authorize-uri: https://accounts.google.com/o/oauth2/v2/auth
         token-uri: https://oauth2.googleapis.com/token
+
+app:
+  oauth2:
+    github:
+      user-url: http://localhost:8089/user
