@@ -18,6 +18,8 @@ public class Registration {
     private String tokenUri;
     private RequestMatcher redirectRequestMatcher;
 
+    private String vendor;
+
     public boolean matchRedirectUrl(final HttpServletRequest request) {
         if (redirectRequestMatcher == null) {
             return false;
@@ -87,4 +89,11 @@ public class Registration {
         this.authorizeUri = authorizeUri;
     }
 
+    public String getVendor() {
+        return vendor;
+    }
+
+    public void setVendor(final String vendor) {
+        this.vendor = vendor;
+    }
 }

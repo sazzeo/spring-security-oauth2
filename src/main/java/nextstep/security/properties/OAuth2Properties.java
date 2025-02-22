@@ -1,6 +1,7 @@
 package nextstep.security.properties;
 
 import jakarta.annotation.Nullable;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -10,6 +11,13 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "security.oauth2")
 public class OAuth2Properties {
     private Map<String, Registration> registration = new HashMap<>();
+
+    @PostConstruct
+    public void init() {
+        registration.forEach((key, value) ->
+                value.setVendor(key)
+        );
+    }
 
     @Nullable
     public Registration getRegistration(final String key) {
@@ -24,8 +32,9 @@ public class OAuth2Properties {
     public Registration getRegistrationByRedirectUrl(final HttpServletRequest request) {
         return registration.values()
                 .stream()
-                .filter(it-> it.matchRedirectUrl(request))
+                .filter(it -> it.matchRedirectUrl(request))
                 .findFirst()
                 .orElse(null);
     }
+
 }
