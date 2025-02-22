@@ -36,7 +36,8 @@ class OAuth2AuthenticationFilterTest {
     @BeforeEach
     void setupMockServer() throws Exception {
         stubForAccessToken();
-        stubForUser();
+        stubForGithubUser();
+        stubForGoogleUser();
     }
 
     @Test
@@ -104,20 +105,27 @@ class OAuth2AuthenticationFilterTest {
                         .withBody(jsonResponse)));
     }
 
-    private static void stubForUser() throws JsonProcessingException {
+    private static void stubForGithubUser() throws JsonProcessingException {
         Map<String, String> userProfile = new HashMap<>();
         userProfile.put("email", "a@a.com");
         userProfile.put("name", "a");
         userProfile.put("avatar_url", "");
         String profileJsonResponse = new ObjectMapper().writeValueAsString(userProfile);
 
-        //github용
         stubFor(get(urlEqualTo("/user"))
                 .willReturn(aResponse()
                         .withHeader(HttpHeaders.CONTENT_TYPE, "application/json")
                         .withBody(profileJsonResponse)));
 
-        //google 용
+    }
+
+    private static void stubForGoogleUser() throws JsonProcessingException {
+        Map<String, String> userProfile = new HashMap<>();
+        userProfile.put("email", "a@a.com");
+        userProfile.put("name", "a");
+        userProfile.put("picture", "");
+        String profileJsonResponse = new ObjectMapper().writeValueAsString(userProfile);
+
         stubFor(get(urlEqualTo("/oauth2/v2/userinfo"))
                 .willReturn(aResponse()
                         .withHeader(HttpHeaders.CONTENT_TYPE, "application/json")

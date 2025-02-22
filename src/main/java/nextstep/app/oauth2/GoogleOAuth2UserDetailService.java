@@ -35,10 +35,10 @@ public class GoogleOAuth2UserDetailService implements OAuth2UserDetailsService {
 
         var email = (String) userResponse.get("email");
         var name = (String) userResponse.get("name");
-        var avatarUrl = (String) userResponse.get("picture");
+        var picture = (String) userResponse.get("picture");
 
         return new OAuth2UserDetailsImpl(email, Map.of("name", name,
-                "avatarUrl", avatarUrl),
+                "avatarUrl", picture),
                 Set.of("USER"));
     }
 

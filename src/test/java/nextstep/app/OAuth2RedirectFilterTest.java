@@ -40,7 +40,7 @@ class OAuth2RedirectFilterTest {
         String expectedRedirectUri = "https://accounts.google.com/o/oauth2/v2/auth" +
                 "?client_id=client-id-test" +
                 "&response_type=code" +
-                "&scope=https://www.googleapis.com/auth/userinfo.email" +
+                "&scope=https://www.googleapis.com/auth/userinfo.email%20https://www.googleapis.com/auth/userinfo.profile" +
                 "&redirect_uri=http://localhost:8080/login/oauth2/code/google";
 
         mockMvc.perform(MockMvcRequestBuilders.get(requestUri))
