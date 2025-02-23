@@ -30,7 +30,7 @@ public class OAuth2RedirectFilter extends GenericFilterBean {
             filterChain.doFilter(servletRequest, servletResponse);
             return;
         }
-        StringBuffer url = httpServletRequest.getRequestURL();
+        var url = httpServletRequest.getRequestURI();
         var vendor = url.substring(url.lastIndexOf("/") + 1);
         var registration = oAuth2RegistrationRepository.getRegistration(vendor);
         if (registration == null) {
