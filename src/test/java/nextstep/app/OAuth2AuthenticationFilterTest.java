@@ -123,7 +123,7 @@ class OAuth2AuthenticationFilterTest {
         Map<String, String> userProfile = new HashMap<>();
         userProfile.put("email", "a@a.com");
         userProfile.put("name", "a");
-        userProfile.put("picture", "");
+        userProfile.put("picture", "picture");
         String profileJsonResponse = new ObjectMapper().writeValueAsString(userProfile);
 
         stubFor(get(urlEqualTo("/oauth2/v2/userinfo"))

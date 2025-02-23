@@ -17,11 +17,12 @@ import java.util.Set;
 public class GoogleOAuth2UserDetailService implements OAuth2UserDetailsService {
 
     private final RestTemplate restTemplate;
-    @Value("${app.oauth2.google.user-url}")
-    private String userUrl;
+    private final String userUrl;
 
-    public GoogleOAuth2UserDetailService(final RestTemplate restTemplate) {
+    public GoogleOAuth2UserDetailService(final RestTemplate restTemplate,
+                                         @Value("${app.oauth2.google.user-url}") final String userUrl) {
         this.restTemplate = restTemplate;
+        this.userUrl = userUrl;
     }
 
     @Override
@@ -37,9 +38,7 @@ public class GoogleOAuth2UserDetailService implements OAuth2UserDetailsService {
         var name = (String) userResponse.get("name");
         var picture = (String) userResponse.get("picture");
 
-        return new OAuth2UserDetailsImpl(email, Map.of("name", name,
-                "avatarUrl", picture),
-                Set.of("USER"));
+        return new OAuth2UserDetailsImpl(email, Map.of("name", name, "avatarUrl", picture), Set.of("USER"));
     }
 
     @Override

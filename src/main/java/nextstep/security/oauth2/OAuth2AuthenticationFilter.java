@@ -14,7 +14,6 @@ import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
 public class OAuth2AuthenticationFilter extends GenericFilterBean {
     private final OAuth2RegistrationRepository oAuth2RegistrationRepository;

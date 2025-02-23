@@ -17,11 +17,14 @@ import java.util.Set;
 public class GithubOAuth2UserDetailService implements OAuth2UserDetailsService {
 
     private final RestTemplate restTemplate;
-    @Value("${app.oauth2.github.user-url}")
-    private String userUrl;
 
-    public GithubOAuth2UserDetailService(final RestTemplate restTemplate) {
+    private final String userUrl;
+
+    public GithubOAuth2UserDetailService(final RestTemplate restTemplate,
+                                         @Value("${app.oauth2.github.user-url}") final String userUrl
+    ) {
         this.restTemplate = restTemplate;
+        this.userUrl = userUrl;
     }
 
     @Override
