@@ -1,6 +1,5 @@
 package nextstep.security.properties;
 
-import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 import nextstep.security.access.MvcRequestMatcher;
 import nextstep.security.access.RequestMatcher;
@@ -12,7 +11,6 @@ import java.net.URISyntaxException;
 public class Registration {
     private String clientId;
     private String clientSecret;
-    private String responseType;
     private String redirectUri;
     private String scope;
     private String authorizeUri;
@@ -34,10 +32,6 @@ public class Registration {
 
     public String getClientSecret() {
         return clientSecret;
-    }
-
-    public String getResponseType() {
-        return responseType;
     }
 
     public String getRedirectUri() {
@@ -64,9 +58,6 @@ public class Registration {
         this.clientSecret = clientSecret;
     }
 
-    public void setResponseType(final String responseType) {
-        this.responseType = responseType;
-    }
 
     public void setRedirectUri(final String redirectUri) {
         this.redirectUri = redirectUri;
@@ -96,16 +87,5 @@ public class Registration {
 
     public void setVendor(final String vendor) {
         this.vendor = vendor;
-    }
-
-    @Nullable
-    public String getGrantType() {
-        if (responseType == null) {
-            return null;
-        }
-        if (this.responseType.equals("code")) {
-            return "authorization_code";
-        }
-        return null;
     }
 }

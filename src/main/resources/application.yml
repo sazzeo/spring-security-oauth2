@@ -9,7 +9,6 @@ security:
       github:
         client-secret: client-secret
         client-id: client-id
-        response-type: code
         redirect-uri: http://localhost:8080/login/oauth2/code/github
         scope: read:user
         authorize-uri: https://github.com/login/oauth/authorize
@@ -17,7 +16,6 @@ security:
       google:
         client-secret: client-secret
         client-id: client-id
-        response-type: code
         redirect-uri: http://localhost:8080/login/oauth2/code/google
         scope: https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile
         authorize-uri: https://accounts.google.com/o/oauth2/v2/auth
