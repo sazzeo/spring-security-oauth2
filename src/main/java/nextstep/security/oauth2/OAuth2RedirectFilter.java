@@ -45,7 +45,7 @@ public class OAuth2RedirectFilter extends GenericFilterBean {
 
         var redirectPath = UriComponentsBuilder.fromHttpUrl(registration.getAuthorizeUri())
                 .queryParam(OAuth2Parameter.CLIENT_ID.getPath(), registration.getClientId())
-                .queryParam(OAuth2Parameter.RESPONSE_TYPE.getPath(), registration.getResponseType())
+                .queryParam(OAuth2Parameter.RESPONSE_TYPE.getPath(), OAuth2Parameter.RESPONSE_TYPE.getDefaultValue())
                 .queryParam(OAuth2Parameter.SCOPE.getPath(), registration.getScope())
                 .queryParam(OAuth2Parameter.REDIRECT_URL.getPath(), registration.getRedirectUrl())
                 .toUriString();
