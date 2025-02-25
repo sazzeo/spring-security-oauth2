@@ -2,14 +2,8 @@ package nextstep.app.oauth2;
 
 import nextstep.security.oauth2.userdetails.AbstractOAuth2UserDetailsService;
 import nextstep.security.oauth2.userdetails.OAuth2UserDetails;
-import nextstep.security.oauth2.userdetails.OAuth2UserDetailsService;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 import java.util.Set;

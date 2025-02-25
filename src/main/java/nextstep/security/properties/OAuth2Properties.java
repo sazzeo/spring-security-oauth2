@@ -2,7 +2,6 @@ package nextstep.security.properties;
 
 import jakarta.annotation.Nullable;
 import jakarta.annotation.PostConstruct;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.HashMap;
