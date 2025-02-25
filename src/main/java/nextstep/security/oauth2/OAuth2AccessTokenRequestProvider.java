@@ -9,6 +9,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.Map;
 
+
 public class OAuth2AccessTokenRequestProvider {
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -18,7 +19,7 @@ public class OAuth2AccessTokenRequestProvider {
         map.put(OAuth2Parameter.CLIENT_SECRET.getPath(), registration.getClientSecret());
         map.put(OAuth2Parameter.CODE.getPath(), code);
         map.put(OAuth2Parameter.GRANT_TYPE.getPath(), registration.getGrantType());
-        map.put(OAuth2Parameter.REDIRECT_URL.getPath(), registration.getRedirectUri());
+        map.put(OAuth2Parameter.REDIRECT_URL.getPath(), registration.getRedirectUrl());
         var response = doPost(registration.getTokenUri(), map);
         return (String) response.get("access_token");
     }

@@ -11,11 +11,14 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "security.oauth2")
 public class OAuth2Properties {
     private Map<String, Registration> registration = new HashMap<>();
+    private String domain;
 
     @PostConstruct
     public void init() {
-        registration.forEach((key, value) ->
-                value.setVendor(key)
+        registration.forEach((key, value) -> {
+                    value.setVendor(key);
+                    value.setDomain(domain);
+                }
         );
     }
 
@@ -28,13 +31,12 @@ public class OAuth2Properties {
         this.registration = registration;
     }
 
-    @Nullable
-    public Registration getRegistrationByRedirectUrl(final HttpServletRequest request) {
-        return registration.values()
-                .stream()
-                .filter(it -> it.matchRedirectUrl(request))
-                .findFirst()
-                .orElse(null);
+    public String getDomain() {
+        return domain;
+    }
+
+    public void setDomain(final String domain) {
+        this.domain = domain;
     }
 
 }

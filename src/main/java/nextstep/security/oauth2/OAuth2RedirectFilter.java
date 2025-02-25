@@ -1,11 +1,14 @@
 package nextstep.security.oauth2;
 
-import jakarta.servlet.*;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import nextstep.security.access.AntRequestMatcher;
 import nextstep.security.access.RequestMatcher;
-import nextstep.app.OAuth2RegistrationRepository;
+import nextstep.security.properties.ClientRegistrationRepository;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.filter.GenericFilterBean;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -15,12 +18,12 @@ import java.io.IOException;
 public class OAuth2RedirectFilter extends GenericFilterBean {
 
     private final RequestMatcher requestMatcher;
-    private final OAuth2RegistrationRepository oAuth2RegistrationRepository;
+    private final ClientRegistrationRepository clientRegistrationRepository;
 
 
-    public OAuth2RedirectFilter(final OAuth2RegistrationRepository oAuth2RegistrationRepository) {
+    public OAuth2RedirectFilter(final ClientRegistrationRepository clientRegistrationRepository) {
         this.requestMatcher = new AntRequestMatcher(HttpMethod.GET, "/oauth2/authorization/**");
-        this.oAuth2RegistrationRepository = oAuth2RegistrationRepository;
+        this.clientRegistrationRepository = clientRegistrationRepository;
     }
 
     @Override
@@ -32,7 +35,7 @@ public class OAuth2RedirectFilter extends GenericFilterBean {
         }
         var url = httpServletRequest.getRequestURI();
         var vendor = url.substring(url.lastIndexOf("/") + 1);
-        var registration = oAuth2RegistrationRepository.getRegistration(vendor);
+        var registration = clientRegistrationRepository.findRegistrationById(vendor);
         if (registration == null) {
             filterChain.doFilter(servletRequest, servletResponse);
             return;
@@ -44,11 +47,10 @@ public class OAuth2RedirectFilter extends GenericFilterBean {
                 .queryParam(OAuth2Parameter.CLIENT_ID.getPath(), registration.getClientId())
                 .queryParam(OAuth2Parameter.RESPONSE_TYPE.getPath(), registration.getResponseType())
                 .queryParam(OAuth2Parameter.SCOPE.getPath(), registration.getScope())
-                .queryParam(OAuth2Parameter.REDIRECT_URL.getPath(), registration.getRedirectUri())
+                .queryParam(OAuth2Parameter.REDIRECT_URL.getPath(), registration.getRedirectUrl())
                 .toUriString();
 
         httpServletResponse.sendRedirect(redirectPath);
     }
-
 
 }

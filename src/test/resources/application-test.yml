@@ -1,11 +1,11 @@
 security:
   oauth2:
+    domain: http://localhost:8080
     registration:
       github:
         client-secret: client-secret-test
         client-id: client-id-test
         response-type: code
-        redirect-uri: http://localhost:8080/login/oauth2/code/github
         scope: read:user
         authorize-uri: https://github.com/login/oauth/authorize
         token-uri: http://localhost:8089/login/oauth/access_token
@@ -13,7 +13,6 @@ security:
         client-secret: client-secret-test
         client-id: client-id-test
         response-type: code
-        redirect-uri: http://localhost:8080/login/oauth2/code/google
         scope: https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile
         authorize-uri: https://accounts.google.com/o/oauth2/v2/auth
         token-uri: http://localhost:8089/token

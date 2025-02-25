@@ -6,28 +6,34 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import nextstep.app.OAuth2RegistrationRepository;
+import nextstep.security.access.AntRequestMatcher;
+import nextstep.security.access.RequestMatcher;
 import nextstep.security.authentication.OAuth2UserDetailsAuthenticationToken;
 import nextstep.security.oauth2.userdetails.OAuth2UserDetailsService;
 import nextstep.security.oauth2.userdetails.OAuth2UserDetailsServiceResolver;
+import nextstep.security.properties.ClientRegistrationRepository;
+import nextstep.security.utils.UrlUtils;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
 import java.util.List;
 
+import static nextstep.security.properties.Registration.REDIRECT_URL_PREFIX;
+
 public class OAuth2AuthenticationFilter extends GenericFilterBean {
-    private final OAuth2RegistrationRepository oAuth2RegistrationRepository;
+    private static final String REDIRECT_MATCH_URL = REDIRECT_URL_PREFIX + "/**";
+    private final ClientRegistrationRepository clientRegistrationRepository;
     private final OAuth2AccessTokenRequestProvider oAuth2AccessTokenRequestProvider = new OAuth2AccessTokenRequestProvider();
-
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
-
     private final OAuth2UserDetailsServiceResolver oauth2UserDetailsServiceResolver;
+    private final RequestMatcher requestMatcher = new AntRequestMatcher(HttpMethod.GET, REDIRECT_MATCH_URL);
 
-    public OAuth2AuthenticationFilter(final OAuth2RegistrationRepository oAuth2RegistrationRepository,
+    public OAuth2AuthenticationFilter(final ClientRegistrationRepository clientRegistrationRepository,
                                       final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler,
                                       final List<OAuth2UserDetailsService> userDetailsServices
     ) {
-        this.oAuth2RegistrationRepository = oAuth2RegistrationRepository;
+        this.clientRegistrationRepository = clientRegistrationRepository;
         this.oauth2UserDetailsServiceResolver = new OAuth2UserDetailsServiceResolver(userDetailsServices);
         this.oAuth2AuthenticationSuccessHandler = oAuth2AuthenticationSuccessHandler;
     }
@@ -36,7 +42,13 @@ public class OAuth2AuthenticationFilter extends GenericFilterBean {
     public void doFilter(final ServletRequest servletRequest, final ServletResponse servletResponse, final FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
         HttpServletResponse httpServletResponse = (HttpServletResponse) servletResponse;
-        var registration = oAuth2RegistrationRepository.getRegistrationByRedirectUrl(httpServletRequest);
+        if (!requestMatcher.matches(httpServletRequest)) {
+            filterChain.doFilter(servletRequest, servletResponse);
+            return;
+        }
+
+        var vendor = UrlUtils.getLastPath(httpServletRequest);
+        var registration = clientRegistrationRepository.findRegistrationById(vendor);
         if (registration == null) {
             filterChain.doFilter(servletRequest, servletResponse);
             return;

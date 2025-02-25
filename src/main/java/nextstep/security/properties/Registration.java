@@ -1,32 +1,21 @@
 package nextstep.security.properties;
 
 import jakarta.annotation.Nullable;
-import jakarta.servlet.http.HttpServletRequest;
-import nextstep.security.access.MvcRequestMatcher;
-import nextstep.security.access.RequestMatcher;
-import org.springframework.http.HttpMethod;
-
-import java.net.URI;
-import java.net.URISyntaxException;
 
 public class Registration {
+    public static final String REDIRECT_URL_PREFIX = "/login/oauth2/code";
+
     private String clientId;
     private String clientSecret;
     private String responseType;
-    private String redirectUri;
     private String scope;
     private String authorizeUri;
     private String tokenUri;
-    private RequestMatcher redirectRequestMatcher;
 
     private String vendor;
 
-    public boolean matchRedirectUrl(final HttpServletRequest request) {
-        if (redirectRequestMatcher == null) {
-            return false;
-        }
-        return redirectRequestMatcher.matches(request);
-    }
+    private String domain;
+
 
     public String getClientId() {
         return clientId;
@@ -38,10 +27,6 @@ public class Registration {
 
     public String getResponseType() {
         return responseType;
-    }
-
-    public String getRedirectUri() {
-        return redirectUri;
     }
 
     public String getScope() {
@@ -66,16 +51,6 @@ public class Registration {
 
     public void setResponseType(final String responseType) {
         this.responseType = responseType;
-    }
-
-    public void setRedirectUri(final String redirectUri) {
-        this.redirectUri = redirectUri;
-        try {
-            var uri = new URI(redirectUri);
-            this.redirectRequestMatcher = new MvcRequestMatcher(HttpMethod.GET, uri.getPath());
-        } catch (URISyntaxException ex) {
-            throw new IllegalArgumentException("oauth2 client redirect-url 이 부적절합니다.");
-        }
     }
 
     public void setScope(final String scope) {
@@ -107,5 +82,13 @@ public class Registration {
             return "authorization_code";
         }
         return null;
+    }
+
+    public void setDomain(final String domain) {
+        this.domain = domain;
+    }
+
+    public String getRedirectUrl() {
+        return domain + REDIRECT_URL_PREFIX + "/" + vendor;
     }
 }
