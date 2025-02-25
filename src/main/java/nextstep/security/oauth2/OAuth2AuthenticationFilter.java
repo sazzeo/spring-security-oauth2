@@ -17,7 +17,7 @@ import java.util.List;
 
 public class OAuth2AuthenticationFilter extends GenericFilterBean {
     private final OAuth2RegistrationRepository oAuth2RegistrationRepository;
-    private final OAuth2AccessTokenRequestProvider oAuth2AccessTokenRequestProvider;
+    private final OAuth2AccessTokenRequestProvider oAuth2AccessTokenRequestProvider = new OAuth2AccessTokenRequestProvider();
 
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
@@ -28,7 +28,6 @@ public class OAuth2AuthenticationFilter extends GenericFilterBean {
                                       final List<OAuth2UserDetailsService> userDetailsServices
     ) {
         this.oAuth2RegistrationRepository = oAuth2RegistrationRepository;
-        this.oAuth2AccessTokenRequestProvider = new OAuth2AccessTokenRequestProviderImpl();
         this.oauth2UserDetailsServiceResolver = new OAuth2UserDetailsServiceResolver(userDetailsServices);
         this.oAuth2AuthenticationSuccessHandler = oAuth2AuthenticationSuccessHandler;
     }
