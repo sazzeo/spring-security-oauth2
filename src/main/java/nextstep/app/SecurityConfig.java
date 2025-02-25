@@ -23,6 +23,7 @@ import nextstep.security.oauth2.OAuth2AuthenticationFilter;
 import nextstep.security.oauth2.OAuth2AuthenticationSuccessHandler;
 import nextstep.security.oauth2.OAuth2RedirectFilter;
 import nextstep.security.oauth2.userdetails.OAuth2UserDetailsService;
+import nextstep.security.properties.ClientRegistrationRepository;
 import nextstep.security.userdetails.UserDetails;
 import nextstep.security.userdetails.UserDetailsService;
 import org.springframework.context.annotation.Bean;
@@ -39,17 +40,17 @@ import java.util.Set;
 public class SecurityConfig {
 
     private final MemberRepository memberRepository;
-    private final OAuth2RegistrationRepository oAuth2RegistrationRepository;
+    private final ClientRegistrationRepository clientRegistrationRepository;
     private final List<OAuth2UserDetailsService> oAuth2UserDetailsServices;
 
     private final MemberService memberService;
 
     public SecurityConfig(final MemberRepository memberRepository,
-                          final OAuth2RegistrationRepository oAuth2RegistrationRepository,
+                          final InMemoryClientRegistrationRepository clientRegistrationRepository,
                           final List<OAuth2UserDetailsService> oAuth2UserDetailsServices,
                           final MemberService memberService) {
         this.memberRepository = memberRepository;
-        this.oAuth2RegistrationRepository = oAuth2RegistrationRepository;
+        this.clientRegistrationRepository = clientRegistrationRepository;
         this.oAuth2UserDetailsServices = oAuth2UserDetailsServices;
         this.memberService = memberService;
     }
@@ -73,9 +74,9 @@ public class SecurityConfig {
         return new DefaultSecurityFilterChain(List.of(new SecurityContextHolderFilter(httpSessionSecurityContextRepository()),
                 new UsernamePasswordAuthenticationFilter(userDetailsService()),
                 new BasicAuthenticationFilter(userDetailsService()),
-                new OAuth2RedirectFilter(oAuth2RegistrationRepository),
+                new OAuth2RedirectFilter(clientRegistrationRepository),
                 new OAuth2AuthenticationFilter(
-                        oAuth2RegistrationRepository,
+                        clientRegistrationRepository,
                         oAuth2AuthenticationSuccessHandler(),
                         oAuth2UserDetailsServices),
                 new AuthorizationFilter(requestAuthorizationManager())));
