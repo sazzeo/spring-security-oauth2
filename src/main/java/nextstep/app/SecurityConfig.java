@@ -1,7 +1,9 @@
 package nextstep.app;
 
+import nextstep.app.application.MemberService;
 import nextstep.app.domain.Member;
 import nextstep.app.domain.MemberRepository;
+import nextstep.app.oauth2.OAuth2AuthenticationSuccessHandlerImpl;
 import nextstep.security.access.AnyRequestMatcher;
 import nextstep.security.access.MvcRequestMatcher;
 import nextstep.security.access.RequestMatcherEntry;
@@ -15,7 +17,13 @@ import nextstep.security.config.DefaultSecurityFilterChain;
 import nextstep.security.config.DelegatingFilterProxy;
 import nextstep.security.config.FilterChainProxy;
 import nextstep.security.config.SecurityFilterChain;
+import nextstep.security.context.HttpSessionSecurityContextRepository;
 import nextstep.security.context.SecurityContextHolderFilter;
+import nextstep.security.oauth2.OAuth2AuthenticationFilter;
+import nextstep.security.oauth2.OAuth2AuthenticationSuccessHandler;
+import nextstep.security.oauth2.OAuth2RedirectFilter;
+import nextstep.security.oauth2.userdetails.OAuth2UserDetailsService;
+import nextstep.security.properties.ClientRegistrationRepository;
 import nextstep.security.userdetails.UserDetails;
 import nextstep.security.userdetails.UserDetailsService;
 import org.springframework.context.annotation.Bean;
@@ -32,9 +40,19 @@ import java.util.Set;
 public class SecurityConfig {
 
     private final MemberRepository memberRepository;
+    private final ClientRegistrationRepository clientRegistrationRepository;
+    private final List<OAuth2UserDetailsService> oAuth2UserDetailsServices;
 
-    public SecurityConfig(MemberRepository memberRepository) {
+    private final MemberService memberService;
+
+    public SecurityConfig(final MemberRepository memberRepository,
+                          final InMemoryClientRegistrationRepository clientRegistrationRepository,
+                          final List<OAuth2UserDetailsService> oAuth2UserDetailsServices,
+                          final MemberService memberService) {
         this.memberRepository = memberRepository;
+        this.clientRegistrationRepository = clientRegistrationRepository;
+        this.oAuth2UserDetailsServices = oAuth2UserDetailsServices;
+        this.memberService = memberService;
     }
 
     @Bean
@@ -42,7 +60,6 @@ public class SecurityConfig {
         return new DelegatingFilterProxy(filterChainProxy(List.of(securityFilterChain())));
     }
 
-    @Bean
     public FilterChainProxy filterChainProxy(List<SecurityFilterChain> securityFilterChains) {
         return new FilterChainProxy(securityFilterChains);
     }
@@ -54,21 +71,25 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain() {
-        return new DefaultSecurityFilterChain(
-                List.of(
-                        new SecurityContextHolderFilter(),
-                        new UsernamePasswordAuthenticationFilter(userDetailsService()),
-                        new BasicAuthenticationFilter(userDetailsService()),
-                        new AuthorizationFilter(requestAuthorizationManager())
-                )
-        );
+        return new DefaultSecurityFilterChain(List.of(new SecurityContextHolderFilter(httpSessionSecurityContextRepository()),
+                new UsernamePasswordAuthenticationFilter(userDetailsService()),
+                new BasicAuthenticationFilter(userDetailsService()),
+                new OAuth2RedirectFilter(clientRegistrationRepository),
+                new OAuth2AuthenticationFilter(
+                        clientRegistrationRepository,
+                        oAuth2AuthenticationSuccessHandler(),
+                        oAuth2UserDetailsServices),
+                new AuthorizationFilter(requestAuthorizationManager())));
+    }
+
+    @Bean
+    public HttpSessionSecurityContextRepository httpSessionSecurityContextRepository() {
+        return new HttpSessionSecurityContextRepository();
     }
 
     @Bean
     public RoleHierarchy roleHierarchy() {
-        return RoleHierarchyImpl.with()
-                .role("ADMIN").implies("USER")
-                .build();
+        return RoleHierarchyImpl.with().role("ADMIN").implies("USER").build();
     }
 
     @Bean
@@ -84,8 +105,7 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> {
-            Member member = memberRepository.findByEmail(username)
-                    .orElseThrow(() -> new AuthenticationException("존재하지 않는 사용자입니다."));
+            Member member = memberRepository.findByEmail(username).orElseThrow(() -> new AuthenticationException("존재하지 않는 사용자입니다."));
 
             return new UserDetails() {
                 @Override
@@ -104,5 +124,12 @@ public class SecurityConfig {
                 }
             };
         };
+    }
+
+    @Bean
+    public OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler() {
+        return new OAuth2AuthenticationSuccessHandlerImpl(
+                httpSessionSecurityContextRepository(),
+                memberService);
     }
 }
