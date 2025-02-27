@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @ConfigurationProperties(prefix = "security.oauth2")
-public class OAuth2Properties {
+public class OAuth2ClientProperties {
     private Map<String, Registration> registration = new HashMap<>();
     private String domain;
 
