@@ -4,7 +4,7 @@ import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 
 public class AuthorizationRequestRepository {
-    private static final String SESSION_NAME = "$AuthorizationRequest";
+    public static final String SESSION_NAME = "$AuthorizationRequest";
 
     public void save(final HttpServletRequest httpServletRequest, final OAuth2AuthorizationRequest authorizationRequest) {
         var session = httpServletRequest.getSession(true);

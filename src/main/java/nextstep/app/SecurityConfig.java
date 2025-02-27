@@ -75,10 +75,10 @@ public class SecurityConfig {
                 new OAuth2AuthorizationRequestRedirectFilter(
                         oAuth2AuthorizationRequestResolver(clientRegistrationRepository),
                         authorizationRequestRepository()),
-                new OAuth2AuthenticationFilter(
-                        clientRegistrationRepository,
+                new OAuth2LoginAuthenticationFilter(
                         oAuth2AuthenticationSuccessHandler(),
-                        oAuth2UserDetailsServices),
+                        oAuth2UserDetailsServices,
+                        authorizationRequestRepository()),
                 new AuthorizationFilter(requestAuthorizationManager())));
     }
 

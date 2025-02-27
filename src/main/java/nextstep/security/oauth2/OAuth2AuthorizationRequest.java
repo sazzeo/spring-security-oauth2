@@ -21,4 +21,8 @@ public class OAuth2AuthorizationRequest {
                 .queryParam(OAuth2Parameter.REDIRECT_URL.getPath(), registration.getRedirectUrl())
                 .toUriString();
     }
+
+    public Registration getRegistration() {
+        return registration;
+    }
 }
