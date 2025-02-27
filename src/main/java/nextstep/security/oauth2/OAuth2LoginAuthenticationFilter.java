@@ -33,7 +33,6 @@ public class OAuth2LoginAuthenticationFilter extends GenericFilterBean {
     public OAuth2LoginAuthenticationFilter(final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler,
                                            final List<OAuth2UserDetailsService> userDetailsServices,
                                            final AuthorizationRequestRepository authorizationRequestRepository
-
     ) {
         this.oauth2UserDetailsServiceResolver = new OAuth2UserDetailsServiceResolver(userDetailsServices);
         this.oAuth2AuthenticationSuccessHandler = oAuth2AuthenticationSuccessHandler;

@@ -2,6 +2,7 @@ package nextstep.security.oauth2;
 
 import jakarta.servlet.http.HttpServletRequest;
 import nextstep.security.properties.ClientRegistrationRepository;
+import nextstep.security.utils.UrlUtils;
 import org.springframework.lang.Nullable;
 
 public class OAuth2AuthorizationRequestResolver {
@@ -14,13 +15,11 @@ public class OAuth2AuthorizationRequestResolver {
 
     @Nullable
     public OAuth2AuthorizationRequest resolve(final HttpServletRequest request) {
-        var url = request.getRequestURI();
-        var vendor = url.substring(url.lastIndexOf("/") + 1);
-        var registration = clientRegistrationRepository.findRegistrationById(vendor);
+        var registrationId = UrlUtils.getLastPath(request);
+        var registration = clientRegistrationRepository.findRegistrationById(registrationId);
         if(registration == null) {
             return null;
         }
-
         return new OAuth2AuthorizationRequest(registration);
     }
 
