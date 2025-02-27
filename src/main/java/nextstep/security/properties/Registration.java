@@ -12,7 +12,7 @@ public class Registration {
     private String authorizeUri;
     private String tokenUri;
 
-    private String vendor;
+    private String registrationId;
 
     private String domain;
 
@@ -65,12 +65,12 @@ public class Registration {
         this.authorizeUri = authorizeUri;
     }
 
-    public String getVendor() {
-        return vendor;
+    public String getRegistrationId() {
+        return registrationId;
     }
 
-    public void setVendor(final String vendor) {
-        this.vendor = vendor;
+    public void setRegistrationId(final String registrationId) {
+        this.registrationId = registrationId;
     }
 
     @Nullable
@@ -89,6 +89,6 @@ public class Registration {
     }
 
     public String getRedirectUrl() {
-        return domain + REDIRECT_URL_PREFIX + "/" + vendor;
+        return domain + REDIRECT_URL_PREFIX + "/" + registrationId;
     }
 }

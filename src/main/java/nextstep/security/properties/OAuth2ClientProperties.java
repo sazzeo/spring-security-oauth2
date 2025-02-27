@@ -15,7 +15,7 @@ public class OAuth2ClientProperties {
     @PostConstruct
     public void init() {
         registration.forEach((key, value) -> {
-                    value.setVendor(key);
+                    value.setRegistrationId(key);
                     value.setDomain(domain);
                 }
         );
