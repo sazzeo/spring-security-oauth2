@@ -19,10 +19,7 @@ import nextstep.security.config.FilterChainProxy;
 import nextstep.security.config.SecurityFilterChain;
 import nextstep.security.context.HttpSessionSecurityContextRepository;
 import nextstep.security.context.SecurityContextHolderFilter;
-import nextstep.security.oauth2.OAuth2AuthenticationFilter;
-import nextstep.security.oauth2.OAuth2AuthenticationSuccessHandler;
-import nextstep.security.oauth2.OAuth2AuthorizationRequestRedirectFilter;
-import nextstep.security.oauth2.OAuth2AuthorizationRequestResolver;
+import nextstep.security.oauth2.*;
 import nextstep.security.oauth2.userdetails.OAuth2UserDetailsService;
 import nextstep.security.properties.ClientRegistrationRepository;
 import nextstep.security.userdetails.UserDetails;
@@ -75,7 +72,9 @@ public class SecurityConfig {
         return new DefaultSecurityFilterChain(List.of(new SecurityContextHolderFilter(httpSessionSecurityContextRepository()),
                 new UsernamePasswordAuthenticationFilter(userDetailsService()),
                 new BasicAuthenticationFilter(userDetailsService()),
-                new OAuth2AuthorizationRequestRedirectFilter(oAuth2AuthorizationRequestResolver(clientRegistrationRepository)),
+                new OAuth2AuthorizationRequestRedirectFilter(
+                        oAuth2AuthorizationRequestResolver(clientRegistrationRepository),
+                        authorizationRequestRepository()),
                 new OAuth2AuthenticationFilter(
                         clientRegistrationRepository,
                         oAuth2AuthenticationSuccessHandler(),
@@ -137,5 +136,10 @@ public class SecurityConfig {
     @Bean
     public OAuth2AuthorizationRequestResolver oAuth2AuthorizationRequestResolver(ClientRegistrationRepository clientRegistrationRepository) {
         return new OAuth2AuthorizationRequestResolver(clientRegistrationRepository);
+    }
+
+    @Bean
+    public AuthorizationRequestRepository authorizationRequestRepository() {
+        return new AuthorizationRequestRepository();
     }
 }
