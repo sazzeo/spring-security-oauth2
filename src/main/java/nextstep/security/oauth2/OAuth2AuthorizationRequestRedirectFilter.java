@@ -2,55 +2,49 @@ package nextstep.security.oauth2;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import nextstep.security.access.AntRequestMatcher;
 import nextstep.security.access.RequestMatcher;
-import nextstep.security.properties.ClientRegistrationRepository;
 import org.springframework.http.HttpMethod;
-import org.springframework.web.filter.GenericFilterBean;
-import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.lang.NonNull;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-public class OAuth2AuthorizationRequestRedirectFilter extends GenericFilterBean {
+public class OAuth2AuthorizationRequestRedirectFilter extends OncePerRequestFilter {
 
     private final RequestMatcher requestMatcher;
-    private final ClientRegistrationRepository clientRegistrationRepository;
+    private final OAuth2AuthorizationRequestResolver requestResolver;
 
-
-    public OAuth2AuthorizationRequestRedirectFilter(final ClientRegistrationRepository clientRegistrationRepository) {
+    public OAuth2AuthorizationRequestRedirectFilter(
+            final OAuth2AuthorizationRequestResolver requestResolver) {
         this.requestMatcher = new AntRequestMatcher(HttpMethod.GET, "/oauth2/authorization/**");
-        this.clientRegistrationRepository = clientRegistrationRepository;
+        this.requestResolver = requestResolver;
     }
 
     @Override
-    public void doFilter(final ServletRequest servletRequest, final ServletResponse servletResponse, final FilterChain filterChain) throws IOException, ServletException {
-        HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
-        if (!requestMatcher.matches(httpServletRequest)) {
-            filterChain.doFilter(servletRequest, servletResponse);
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
+        if (!requestMatcher.matches(request)) {
+            filterChain.doFilter(request, response);
             return;
         }
-        var url = httpServletRequest.getRequestURI();
-        var vendor = url.substring(url.lastIndexOf("/") + 1);
-        var registration = clientRegistrationRepository.findRegistrationById(vendor);
-        if (registration == null) {
-            filterChain.doFilter(servletRequest, servletResponse);
+        var oAuth2AuthorizationRequest = requestResolver.resolve(request);
+
+        if (oAuth2AuthorizationRequest == null) {
+            filterChain.doFilter(request, response);
             return;
         }
 
-        HttpServletResponse httpServletResponse = (HttpServletResponse) servletResponse;
 
-        var redirectPath = UriComponentsBuilder.fromHttpUrl(registration.getAuthorizeUri())
-                .queryParam(OAuth2Parameter.CLIENT_ID.getPath(), registration.getClientId())
-                .queryParam(OAuth2Parameter.RESPONSE_TYPE.getPath(), OAuth2Parameter.RESPONSE_TYPE.getDefaultValue())
-                .queryParam(OAuth2Parameter.SCOPE.getPath(), registration.getScope())
-                .queryParam(OAuth2Parameter.REDIRECT_URL.getPath(), registration.getRedirectUrl())
-                .toUriString();
+        sendRedirectForAuthorization(request, response, oAuth2AuthorizationRequest);
+    }
 
-        httpServletResponse.sendRedirect(redirectPath);
+    public void sendRedirectForAuthorization(@NonNull HttpServletRequest request,
+                                             @NonNull HttpServletResponse response,
+                                             @NonNull OAuth2AuthorizationRequest auth2AuthorizationRequest) throws IOException {
+
+        response.sendRedirect(auth2AuthorizationRequest.getRedirectPath());
     }
 
 }
