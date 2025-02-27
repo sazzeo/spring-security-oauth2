@@ -15,13 +15,13 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 
-public class OAuth2RedirectFilter extends GenericFilterBean {
+public class OAuth2AuthorizationRequestRedirectFilter extends GenericFilterBean {
 
     private final RequestMatcher requestMatcher;
     private final ClientRegistrationRepository clientRegistrationRepository;
 
 
-    public OAuth2RedirectFilter(final ClientRegistrationRepository clientRegistrationRepository) {
+    public OAuth2AuthorizationRequestRedirectFilter(final ClientRegistrationRepository clientRegistrationRepository) {
         this.requestMatcher = new AntRequestMatcher(HttpMethod.GET, "/oauth2/authorization/**");
         this.clientRegistrationRepository = clientRegistrationRepository;
     }

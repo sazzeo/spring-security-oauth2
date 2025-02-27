@@ -21,7 +21,7 @@ import nextstep.security.context.HttpSessionSecurityContextRepository;
 import nextstep.security.context.SecurityContextHolderFilter;
 import nextstep.security.oauth2.OAuth2AuthenticationFilter;
 import nextstep.security.oauth2.OAuth2AuthenticationSuccessHandler;
-import nextstep.security.oauth2.OAuth2RedirectFilter;
+import nextstep.security.oauth2.OAuth2AuthorizationRequestRedirectFilter;
 import nextstep.security.oauth2.userdetails.OAuth2UserDetailsService;
 import nextstep.security.properties.ClientRegistrationRepository;
 import nextstep.security.userdetails.UserDetails;
@@ -74,7 +74,7 @@ public class SecurityConfig {
         return new DefaultSecurityFilterChain(List.of(new SecurityContextHolderFilter(httpSessionSecurityContextRepository()),
                 new UsernamePasswordAuthenticationFilter(userDetailsService()),
                 new BasicAuthenticationFilter(userDetailsService()),
-                new OAuth2RedirectFilter(clientRegistrationRepository),
+                new OAuth2AuthorizationRequestRedirectFilter(clientRegistrationRepository),
                 new OAuth2AuthenticationFilter(
                         clientRegistrationRepository,
                         oAuth2AuthenticationSuccessHandler(),
