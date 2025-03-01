@@ -24,7 +24,7 @@ public class OAuth2LoginAuthenticationProvider implements AuthenticationManager 
         if (authentication instanceof OAuth2LoginAuthenticationToken token) {
             var registration = token.getRegistration();
             var oAuth2AuthorizationCodeAuthenticationToken = authenticationManager.authenticate(OAuth2AuthorizationCodeAuthenticationToken.unauthenticated(token.getPrincipal(), //code가 들어있음
-                    token.getAuthorities(), registration));
+                    registration));
             return createOAuth2LoginAuthenticationTokenResponse(registration, oAuth2AuthorizationCodeAuthenticationToken);
         }
         return null;

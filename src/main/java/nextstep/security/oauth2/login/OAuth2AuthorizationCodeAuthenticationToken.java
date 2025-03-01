@@ -11,8 +11,6 @@ public class OAuth2AuthorizationCodeAuthenticationToken implements Authenticatio
 
     private final boolean authenticated;
 
-    private final Set<String> authorities;
-
     private final Registration registration;
 
     private final String accessToken;
@@ -20,29 +18,25 @@ public class OAuth2AuthorizationCodeAuthenticationToken implements Authenticatio
 
     private OAuth2AuthorizationCodeAuthenticationToken(final String code,
                                                        final boolean authenticated,
-                                                       final Set<String> authorities,
                                                        final Registration registration,
                                                        final String accessToken) {
         this.code = code;
         this.authenticated = authenticated;
-        this.authorities = authorities;
         this.registration = registration;
         this.accessToken = accessToken;
     }
 
     public static OAuth2AuthorizationCodeAuthenticationToken unauthenticated(final String code,
-                                                                             final Set<String> authorities,
                                                                              final Registration registration
 
     ) {
-        return new OAuth2AuthorizationCodeAuthenticationToken(code, false, authorities, registration, null);
+        return new OAuth2AuthorizationCodeAuthenticationToken(code, false, registration, null);
     }
 
     public static OAuth2AuthorizationCodeAuthenticationToken authenticated(String code,
-                                                                           Set<String> authorities,
                                                                            final Registration registration,
                                                                            final String accessToken) {
-        return new OAuth2AuthorizationCodeAuthenticationToken(code, true, authorities, registration, accessToken);
+        return new OAuth2AuthorizationCodeAuthenticationToken(code, true, registration, accessToken);
     }
 
     @Override
@@ -67,5 +61,9 @@ public class OAuth2AuthorizationCodeAuthenticationToken implements Authenticatio
 
     public Registration getRegistration() {
         return registration;
+    }
+
+    public String getAccessToken() {
+        return accessToken;
     }
 }
