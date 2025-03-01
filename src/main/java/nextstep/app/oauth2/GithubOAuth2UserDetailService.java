@@ -35,7 +35,7 @@ public class GithubOAuth2UserDetailService extends AbstractOAuth2UserDetailsServ
     }
 
     @Override
-    public String getVendor() {
+    public String getRegistrationId() {
         return "github";
     }
 }
