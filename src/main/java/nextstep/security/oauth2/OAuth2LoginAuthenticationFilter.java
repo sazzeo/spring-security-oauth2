@@ -21,18 +21,18 @@ import static nextstep.security.properties.Registration.REDIRECT_URL_PREFIX;
 
 public class OAuth2LoginAuthenticationFilter extends GenericFilterBean {
     private static final String REDIRECT_MATCH_URL = REDIRECT_URL_PREFIX + "/**";
-    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+    private final AuthenticationSuccessHandler authenticationSuccessHandler;
     private final RequestMatcher requestMatcher = new AntRequestMatcher(HttpMethod.GET, REDIRECT_MATCH_URL);
     private final AuthorizationRequestRepository authorizationRequestRepository;
 
     private final AuthenticationManager authenticationManager;
 
 
-    public OAuth2LoginAuthenticationFilter(final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler,
+    public OAuth2LoginAuthenticationFilter(final AuthenticationSuccessHandler authenticationSuccessHandler,
                                            final AuthorizationRequestRepository authorizationRequestRepository,
                                            final AuthenticationManager authenticationManager
     ) {
-        this.oAuth2AuthenticationSuccessHandler = oAuth2AuthenticationSuccessHandler;
+        this.authenticationSuccessHandler = authenticationSuccessHandler;
         this.authorizationRequestRepository = authorizationRequestRepository;
         this.authenticationManager = authenticationManager;
     }
@@ -69,7 +69,7 @@ public class OAuth2LoginAuthenticationFilter extends GenericFilterBean {
         }
 
         if (authenticated instanceof OAuth2LoginAuthenticationToken authenticationToken) {
-            oAuth2AuthenticationSuccessHandler.onSuccess(httpServletRequest, httpServletResponse, authenticationToken);
+            authenticationSuccessHandler.onSuccess(httpServletRequest, httpServletResponse, authenticationToken);
         }
     }
 }

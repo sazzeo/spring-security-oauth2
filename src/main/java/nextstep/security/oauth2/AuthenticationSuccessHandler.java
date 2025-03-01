@@ -6,7 +6,7 @@ import nextstep.security.authentication.Authentication;
 
 import java.io.IOException;
 
-public interface OAuth2AuthenticationSuccessHandler {
+public interface AuthenticationSuccessHandler {
 
     void onSuccess(final HttpServletRequest request, final HttpServletResponse response, Authentication authentication) throws IOException;
 }

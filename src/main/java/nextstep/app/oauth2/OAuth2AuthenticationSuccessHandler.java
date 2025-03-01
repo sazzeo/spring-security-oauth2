@@ -8,17 +8,17 @@ import nextstep.security.authentication.Authentication;
 import nextstep.security.context.HttpSessionSecurityContextRepository;
 import nextstep.security.context.SecurityContext;
 import nextstep.security.context.SecurityContextHolder;
-import nextstep.security.oauth2.OAuth2AuthenticationSuccessHandler;
+import nextstep.security.oauth2.AuthenticationSuccessHandler;
 import nextstep.security.oauth2.login.OAuth2LoginAuthenticationToken;
 
 import java.io.IOException;
 
-public class OAuth2AuthenticationSuccessHandlerImpl implements OAuth2AuthenticationSuccessHandler {
+public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
     private final HttpSessionSecurityContextRepository securityContextRepository;
     private final MemberService memberService;
 
-    public OAuth2AuthenticationSuccessHandlerImpl(final HttpSessionSecurityContextRepository securityContextRepository,
-                                                  final MemberService memberService) {
+    public OAuth2AuthenticationSuccessHandler(final HttpSessionSecurityContextRepository securityContextRepository,
+                                              final MemberService memberService) {
         this.securityContextRepository = securityContextRepository;
         this.memberService = memberService;
     }
