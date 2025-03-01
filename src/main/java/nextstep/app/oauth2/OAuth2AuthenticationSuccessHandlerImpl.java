@@ -5,13 +5,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import nextstep.app.application.MemberService;
 import nextstep.app.payload.Oauth2MemberSaveDto;
 import nextstep.security.authentication.Authentication;
-import nextstep.security.authentication.OAuth2UserDetailsAuthenticationToken;
 import nextstep.security.context.HttpSessionSecurityContextRepository;
 import nextstep.security.context.SecurityContext;
 import nextstep.security.context.SecurityContextHolder;
 import nextstep.security.oauth2.OAuth2AuthenticationSuccessHandler;
+import nextstep.security.oauth2.login.OAuth2LoginAuthenticationToken;
 
 import java.io.IOException;
+
 public class OAuth2AuthenticationSuccessHandlerImpl implements OAuth2AuthenticationSuccessHandler {
     private final HttpSessionSecurityContextRepository securityContextRepository;
     private final MemberService memberService;
@@ -24,10 +25,10 @@ public class OAuth2AuthenticationSuccessHandlerImpl implements OAuth2Authenticat
 
     @Override
     public void onSuccess(final HttpServletRequest request, final HttpServletResponse response, final Authentication authentication) throws IOException {
-        if (authentication instanceof OAuth2UserDetailsAuthenticationToken authToken) {
-            var otherDetails = authToken.getOAuth2OtherDetails();
+        if (authentication instanceof OAuth2LoginAuthenticationToken authToken) {
+            var otherDetails = authToken.getOAuth2UserDetails().getOthers();
             memberService.saveOauth2Member(new Oauth2MemberSaveDto(
-                    (String) authToken.getPrincipal(),
+                    authToken.getPrincipal(),
                     otherDetails.get("name"),
                     otherDetails.get("avatar_url")
             ));

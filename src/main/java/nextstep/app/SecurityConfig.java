@@ -10,6 +10,7 @@ import nextstep.security.access.RequestMatcherEntry;
 import nextstep.security.access.hierarchicalroles.RoleHierarchy;
 import nextstep.security.access.hierarchicalroles.RoleHierarchyImpl;
 import nextstep.security.authentication.AuthenticationException;
+import nextstep.security.authentication.AuthenticationManager;
 import nextstep.security.authentication.BasicAuthenticationFilter;
 import nextstep.security.authentication.UsernamePasswordAuthenticationFilter;
 import nextstep.security.authorization.*;
@@ -20,6 +21,7 @@ import nextstep.security.config.SecurityFilterChain;
 import nextstep.security.context.HttpSessionSecurityContextRepository;
 import nextstep.security.context.SecurityContextHolderFilter;
 import nextstep.security.oauth2.*;
+import nextstep.security.oauth2.login.OAuth2LoginAuthenticationProvider;
 import nextstep.security.oauth2.userdetails.OAuth2UserDetailsService;
 import nextstep.security.properties.ClientRegistrationRepository;
 import nextstep.security.userdetails.UserDetails;
@@ -77,8 +79,8 @@ public class SecurityConfig {
                         authorizationRequestRepository()),
                 new OAuth2LoginAuthenticationFilter(
                         oAuth2AuthenticationSuccessHandler(),
-                        oAuth2UserDetailsServices,
-                        authorizationRequestRepository()),
+                        authorizationRequestRepository(),
+                        oAuth2LoginAuthenticationProvider()),
                 new AuthorizationFilter(requestAuthorizationManager())));
     }
 
@@ -142,4 +144,9 @@ public class SecurityConfig {
     public AuthorizationRequestRepository authorizationRequestRepository() {
         return new AuthorizationRequestRepository();
     }
+
+    public AuthenticationManager oAuth2LoginAuthenticationProvider() {
+        return new OAuth2LoginAuthenticationProvider(oAuth2UserDetailsServices);
+    }
+
 }
