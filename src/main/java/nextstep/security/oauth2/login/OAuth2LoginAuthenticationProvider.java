@@ -2,8 +2,8 @@ package nextstep.security.oauth2.login;
 
 import jakarta.annotation.Nullable;
 import nextstep.security.authentication.Authentication;
+import nextstep.security.authentication.AuthenticationException;
 import nextstep.security.authentication.AuthenticationManager;
-import nextstep.security.authorization.AccessDeniedException;
 import nextstep.security.oauth2.userdetails.OAuth2UserDetailsService;
 import nextstep.security.oauth2.userdetails.OAuth2UserDetailsServiceResolver;
 import nextstep.security.properties.Registration;
@@ -32,7 +32,7 @@ public class OAuth2LoginAuthenticationProvider implements AuthenticationManager 
 
     private OAuth2LoginAuthenticationToken createOAuth2LoginAuthenticationTokenResponse(final Registration registration, final Authentication authentication) {
         if (!authentication.isAuthenticated()) {
-            throw new AccessDeniedException("code 정보로부터 accessToken 을 받아오는데 실패했습니다.");
+            throw new AuthenticationException("code 정보로부터 accessToken 을 받아오는데 실패했습니다.");
         }
         if (!(authentication instanceof final OAuth2AuthorizationCodeAuthenticationToken oAuth2AuthorizationCodeAuthenticationToken)) {
             return null;
@@ -43,7 +43,7 @@ public class OAuth2LoginAuthenticationProvider implements AuthenticationManager 
             var userDetails = oauth2DetailsService.loadUserByAccessToken(oAuth2AuthorizationCodeAuthenticationToken.getAccessToken());
             return OAuth2LoginAuthenticationToken.authenticated(userDetails);
         } catch (Exception ex) {
-            throw new AccessDeniedException("accessToken 으로 부터 userInfo를 받아오는데 실패했습니다.");
+            throw new AuthenticationException("accessToken 으로 부터 userInfo를 받아오는데 실패했습니다.");
         }
     }
 
