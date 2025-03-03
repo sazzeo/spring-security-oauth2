@@ -8,7 +8,7 @@ import nextstep.security.authentication.Authentication;
 import nextstep.security.context.HttpSessionSecurityContextRepository;
 import nextstep.security.context.SecurityContext;
 import nextstep.security.context.SecurityContextHolder;
-import nextstep.security.oauth2.AuthenticationSuccessHandler;
+import nextstep.security.authentication.AuthenticationSuccessHandler;
 import nextstep.security.oauth2.login.OAuth2LoginAuthenticationToken;
 
 import java.io.IOException;
