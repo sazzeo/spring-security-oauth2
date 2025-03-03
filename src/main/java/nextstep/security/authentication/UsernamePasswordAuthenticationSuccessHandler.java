@@ -5,7 +5,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import nextstep.security.context.HttpSessionSecurityContextRepository;
 import nextstep.security.context.SecurityContext;
 import nextstep.security.context.SecurityContextHolder;
-import nextstep.security.oauth2.AuthenticationSuccessHandler;
 
 import java.io.IOException;
 

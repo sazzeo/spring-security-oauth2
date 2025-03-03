@@ -3,7 +3,6 @@ package nextstep.security.authentication;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import nextstep.security.access.MvcRequestMatcher;
-import nextstep.security.oauth2.AuthenticationSuccessHandler;
 import nextstep.security.userdetails.UserDetailsService;
 import org.springframework.http.HttpMethod;
 
@@ -18,7 +17,7 @@ public class UsernamePasswordAuthenticationFilter extends AbstractAuthentication
 
     public UsernamePasswordAuthenticationFilter(UserDetailsService userDetailsService,
                                                 AuthenticationSuccessHandler successHandler) {
-        super(DEFAULT_MVC_REQUEST_MATCHER, successHandler);
+        super(DEFAULT_MVC_REQUEST_MATCHER, successHandler, DefaultAuthenticationFailHandler.getInstance());
         this.authenticationManager = new ProviderManager(
                 List.of(new DaoAuthenticationProvider(userDetailsService))
         );
