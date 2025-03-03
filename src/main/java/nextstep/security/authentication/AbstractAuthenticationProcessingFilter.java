@@ -7,9 +7,6 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import nextstep.security.access.RequestMatcher;
-import nextstep.security.context.SecurityContextHolder;
-import nextstep.security.oauth2.AuthenticationSuccessHandler;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
@@ -19,11 +16,14 @@ public abstract class AbstractAuthenticationProcessingFilter extends GenericFilt
     private final RequestMatcher requestMatcher;
 
     private final AuthenticationSuccessHandler authenticationSuccessHandler;
+    private final AuthenticationFailHandler authenticationFailHandler;
 
     public AbstractAuthenticationProcessingFilter(final RequestMatcher requestMatcher,
-                                                  final AuthenticationSuccessHandler authenticationSuccessHandler) {
+                                                  final AuthenticationSuccessHandler authenticationSuccessHandler,
+                                                  final AuthenticationFailHandler authenticationFailHandler) {
         this.requestMatcher = requestMatcher;
         this.authenticationSuccessHandler = authenticationSuccessHandler;
+        this.authenticationFailHandler = authenticationFailHandler;
     }
 
     @Override
@@ -41,18 +41,15 @@ public abstract class AbstractAuthenticationProcessingFilter extends GenericFilt
             if (authenticationResult == null) {
                 return;
             }
-
             authenticationSuccessHandler.onSuccess(request, response, authenticationResult);
-
-
-
-        } catch (AuthenticationException e) {
-            SecurityContextHolder.clearContext();
-            response.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+        } catch (AuthenticationException ex) {
+            authenticationFailHandler.onFail(request, response, ex);
+        } catch (Exception ex) {
+            authenticationFailHandler.onFail(request, response, new AuthenticationException());
         }
     }
 
-    abstract Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response);
+    protected abstract Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response);
 
     private boolean requiresAuthentication(HttpServletRequest request) {
         return requestMatcher.matches(request);
