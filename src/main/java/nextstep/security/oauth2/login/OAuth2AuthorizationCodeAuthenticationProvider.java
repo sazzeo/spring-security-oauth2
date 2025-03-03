@@ -1,10 +1,10 @@
 package nextstep.security.oauth2.login;
 
 import nextstep.security.authentication.Authentication;
-import nextstep.security.authentication.AuthenticationManager;
+import nextstep.security.authentication.AuthenticationProvider;
 import nextstep.security.oauth2.OAuth2AccessTokenRequestProvider;
 
-public class OAuth2AuthorizationCodeAuthenticationProvider implements AuthenticationManager {
+public class OAuth2AuthorizationCodeAuthenticationProvider implements AuthenticationProvider {
 
     private final OAuth2AccessTokenRequestProvider oAuth2AccessTokenRequestProvider = new OAuth2AccessTokenRequestProvider();
 
@@ -15,6 +15,11 @@ public class OAuth2AuthorizationCodeAuthenticationProvider implements Authentica
             return createOAuth2AuthorizationCodeAuthenticationToken(token);
         }
         return null;
+    }
+
+    @Override
+    public boolean supports(final Class<?> authentication) {
+        return authentication == OAuth2AuthorizationCodeAuthenticationToken.class;
     }
 
     private OAuth2AuthorizationCodeAuthenticationToken createOAuth2AuthorizationCodeAuthenticationToken(final OAuth2AuthorizationCodeAuthenticationToken token) {
