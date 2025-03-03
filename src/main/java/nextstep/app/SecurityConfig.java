@@ -4,6 +4,7 @@ import nextstep.app.application.MemberService;
 import nextstep.app.domain.Member;
 import nextstep.app.domain.MemberRepository;
 import nextstep.app.oauth2.OAuth2AuthenticationSuccessHandler;
+import nextstep.security.access.AntRequestMatcher;
 import nextstep.security.access.AnyRequestMatcher;
 import nextstep.security.access.MvcRequestMatcher;
 import nextstep.security.access.RequestMatcherEntry;
@@ -72,6 +73,7 @@ public class SecurityConfig {
                 new UsernamePasswordAuthenticationFilter(userDetailsService(), new UsernamePasswordAuthenticationSuccessHandler()),
                 new BasicAuthenticationFilter(userDetailsService()),
                 new OAuth2AuthorizationRequestRedirectFilter(
+                        new AntRequestMatcher(HttpMethod.GET, "/oauth2/authorization/**"),
                         oAuth2AuthorizationRequestResolver(clientRegistrationRepository),
                         authorizationRequestRepository()),
                 new OAuth2LoginAuthenticationFilter(

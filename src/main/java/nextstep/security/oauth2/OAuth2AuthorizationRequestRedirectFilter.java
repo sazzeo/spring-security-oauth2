@@ -20,9 +20,10 @@ public class OAuth2AuthorizationRequestRedirectFilter extends OncePerRequestFilt
     private final AuthorizationRequestRepository authorizationRequestRepository;
 
     public OAuth2AuthorizationRequestRedirectFilter(
+            final RequestMatcher requestMatcher,
             final OAuth2AuthorizationRequestResolver requestResolver,
             final AuthorizationRequestRepository authorizationRequestRepository) {
-        this.requestMatcher = new AntRequestMatcher(HttpMethod.GET, "/oauth2/authorization/**");
+        this.requestMatcher = requestMatcher;
         this.requestResolver = requestResolver;
         this.authorizationRequestRepository = authorizationRequestRepository;
     }
