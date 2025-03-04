@@ -44,8 +44,6 @@ public abstract class AbstractAuthenticationProcessingFilter extends GenericFilt
             authenticationSuccessHandler.onSuccess(request, response, authenticationResult);
         } catch (AuthenticationException ex) {
             authenticationFailHandler.onFail(request, response, ex);
-        } catch (Exception ex) {
-            authenticationFailHandler.onFail(request, response, new AuthenticationException());
         }
     }
 
