@@ -3,7 +3,6 @@ package nextstep.security.oauth2.login;
 import jakarta.annotation.Nullable;
 import nextstep.security.authentication.Authentication;
 import nextstep.security.authentication.AuthenticationException;
-import nextstep.security.authentication.AuthenticationManager;
 import nextstep.security.authentication.AuthenticationProvider;
 import nextstep.security.oauth2.userdetails.OAuth2UserDetailsService;
 import nextstep.security.oauth2.userdetails.OAuth2UserDetailsServiceResolver;
@@ -11,7 +10,7 @@ import nextstep.security.properties.Registration;
 
 import java.util.List;
 
-public class OAuth2LoginAuthenticationProvider implements AuthenticationManager {
+public class OAuth2LoginAuthenticationProvider implements AuthenticationProvider {
     private final AuthenticationProvider authenticationProvider = new OAuth2AuthorizationCodeAuthenticationProvider();
     private final OAuth2UserDetailsServiceResolver oauth2UserDetailsServiceResolver;
 
@@ -22,13 +21,16 @@ public class OAuth2LoginAuthenticationProvider implements AuthenticationManager 
     @Nullable
     @Override
     public Authentication authenticate(final Authentication authentication) {
-        if (authentication instanceof OAuth2LoginAuthenticationToken token) {
-            var registration = token.getRegistration();
-            var oAuth2AuthorizationCodeAuthenticationToken = authenticationProvider.authenticate(OAuth2AuthorizationCodeAuthenticationToken.unauthenticated(token.getPrincipal(), //code가 들어있음
-                    registration));
-            return createOAuth2LoginAuthenticationTokenResponse(registration, oAuth2AuthorizationCodeAuthenticationToken);
-        }
-        return null;
+        OAuth2LoginAuthenticationToken token = (OAuth2LoginAuthenticationToken) authentication;
+        var registration = token.getRegistration();
+        var oAuth2AuthorizationCodeAuthenticationToken = authenticationProvider.authenticate(OAuth2AuthorizationCodeAuthenticationToken.unauthenticated(token.getPrincipal(), //code가 들어있음
+                registration));
+        return createOAuth2LoginAuthenticationTokenResponse(registration, oAuth2AuthorizationCodeAuthenticationToken);
+    }
+
+    @Override
+    public boolean supports(final Class<?> authentication) {
+        return authentication == OAuth2LoginAuthenticationToken.class;
     }
 
     private OAuth2LoginAuthenticationToken createOAuth2LoginAuthenticationTokenResponse(final Registration registration, final Authentication authentication) {
@@ -46,6 +48,5 @@ public class OAuth2LoginAuthenticationProvider implements AuthenticationManager 
             throw new AuthenticationException("accessToken 으로 부터 userInfo를 받아오는데 실패했습니다.");
         }
     }
-
 
 }

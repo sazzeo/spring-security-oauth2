@@ -145,7 +145,8 @@ public class SecurityConfig {
     }
 
     public AuthenticationManager oAuth2LoginAuthenticationProvider() {
-        return new OAuth2LoginAuthenticationProvider(oAuth2UserDetailsServices);
+        return new ProviderManager(List.of(
+                new OAuth2LoginAuthenticationProvider(oAuth2UserDetailsServices)));
     }
 
 }
