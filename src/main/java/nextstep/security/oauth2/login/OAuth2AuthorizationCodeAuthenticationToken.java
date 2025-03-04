@@ -1,7 +1,7 @@
 package nextstep.security.oauth2.login;
 
 import nextstep.security.authentication.Authentication;
-import nextstep.security.properties.Registration;
+import nextstep.security.oauth2.ClientRegistration;
 
 import java.util.Set;
 
@@ -11,14 +11,14 @@ public class OAuth2AuthorizationCodeAuthenticationToken implements Authenticatio
 
     private final boolean authenticated;
 
-    private final Registration registration;
+    private final ClientRegistration registration;
 
     private final String accessToken;
 
 
     private OAuth2AuthorizationCodeAuthenticationToken(final String code,
                                                        final boolean authenticated,
-                                                       final Registration registration,
+                                                       final ClientRegistration registration,
                                                        final String accessToken) {
         this.code = code;
         this.authenticated = authenticated;
@@ -27,14 +27,14 @@ public class OAuth2AuthorizationCodeAuthenticationToken implements Authenticatio
     }
 
     public static OAuth2AuthorizationCodeAuthenticationToken unauthenticated(final String code,
-                                                                             final Registration registration
+                                                                             final ClientRegistration registration
 
     ) {
         return new OAuth2AuthorizationCodeAuthenticationToken(code, false, registration, null);
     }
 
     public static OAuth2AuthorizationCodeAuthenticationToken authenticated(String code,
-                                                                           final Registration registration,
+                                                                           final ClientRegistration registration,
                                                                            final String accessToken) {
         return new OAuth2AuthorizationCodeAuthenticationToken(code, true, registration, accessToken);
     }
@@ -59,7 +59,7 @@ public class OAuth2AuthorizationCodeAuthenticationToken implements Authenticatio
         return this.authenticated;
     }
 
-    public Registration getRegistration() {
+    public ClientRegistration getRegistration() {
         return registration;
     }
 

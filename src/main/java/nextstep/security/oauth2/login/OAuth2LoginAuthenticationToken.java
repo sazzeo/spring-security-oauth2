@@ -1,9 +1,9 @@
 package nextstep.security.oauth2.login;
 
 import nextstep.security.authentication.Authentication;
+import nextstep.security.oauth2.ClientRegistration;
 import nextstep.security.oauth2.OAuth2AuthorizationRequest;
 import nextstep.security.oauth2.userdetails.OAuth2UserDetails;
-import nextstep.security.properties.Registration;
 
 import java.util.Set;
 
@@ -72,7 +72,7 @@ public class OAuth2LoginAuthenticationToken implements Authentication {
         return this.authenticated;
     }
 
-    public Registration getRegistration() {
+    public ClientRegistration getRegistration() {
         return this.oAuth2AuthorizationRequest.getRegistration();
     }
 

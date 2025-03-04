@@ -7,10 +7,8 @@ import nextstep.security.authentication.*;
 import nextstep.security.oauth2.login.OAuth2LoginAuthenticationToken;
 import org.springframework.http.HttpMethod;
 
-import static nextstep.security.properties.Registration.REDIRECT_URL_PREFIX;
-
 public class OAuth2LoginAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
-    private static final String REDIRECT_MATCH_URL = REDIRECT_URL_PREFIX + "/**";
+    private static final String REDIRECT_MATCH_URL = "/login/oauth2/code/*";
     private final AuthorizationRequestRepository authorizationRequestRepository;
     private final AuthenticationManager authenticationManager;
 

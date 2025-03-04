@@ -4,9 +4,9 @@ import jakarta.annotation.Nullable;
 import nextstep.security.authentication.Authentication;
 import nextstep.security.authentication.AuthenticationException;
 import nextstep.security.authentication.AuthenticationProvider;
+import nextstep.security.oauth2.ClientRegistration;
 import nextstep.security.oauth2.userdetails.OAuth2UserDetailsService;
 import nextstep.security.oauth2.userdetails.OAuth2UserDetailsServiceResolver;
-import nextstep.security.properties.Registration;
 
 import java.util.List;
 
@@ -33,7 +33,7 @@ public class OAuth2LoginAuthenticationProvider implements AuthenticationProvider
         return authentication == OAuth2LoginAuthenticationToken.class;
     }
 
-    private OAuth2LoginAuthenticationToken createOAuth2LoginAuthenticationTokenResponse(final Registration registration, final Authentication authentication) {
+    private OAuth2LoginAuthenticationToken createOAuth2LoginAuthenticationTokenResponse(final ClientRegistration registration, final Authentication authentication) {
         if (!authentication.isAuthenticated()) {
             throw new AuthenticationException("code 정보로부터 accessToken 을 받아오는데 실패했습니다.");
         }
